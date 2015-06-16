@@ -62,6 +62,8 @@ import re
 from ete2 import Tree
 # for writing to file
 import csv
+# for creating command line interface
+import argparse
 
 #-----------------------------------------------------------------------------#
 
@@ -209,3 +211,36 @@ def tree_stats(directory, filename="tree_stats_output.csv",
         
     ## Return
     return("Finished, the file output is in your current worknig directory")
+    
+    
+    ## END OF FUNCTION
+    
+#-----------------------------------------------------------------------------#
+    
+# create the argparse so that it can be run from the command-line. 
+    
+parser = argparse.ArgumentParser(prog="tree_stats", prefix_chars='-',
+                                 description='Calculates tree statistics')
+
+# add directroy argument, must be given
+parser.add_argument("directory", metavar="Tree Directory", action="store")
+
+# give output file name, optional
+parser.add_argument("-filename", metavar="Output file name", action="store", 
+                    default="tree_stats_output.csv", required=False,
+                    dest="filename")
+
+# add optional argument for output directory
+parser.add_argument("-outdir", metavar="Output Directory", action="store",
+                    default=os.getcwd(), required=False, 
+                    dest="output_directory")
+
+parser.parse_args(["-filename"])
+parser.parse_args(["-outdir"])
+
+
+## CALL THE FUNCTION
+
+tree_stats(directory= directory, filename=filename, 
+           output_directory=output_directory)
+    

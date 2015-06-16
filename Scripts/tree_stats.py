@@ -11,9 +11,8 @@ Created on Fri Jun 12 16:28:29 2015
 
 @author: gideon
 
-###                         TREE_STATS_V3                                   ###
+###                         TREE_STATS                                   ###
 
-                        NOT WORKING YET
 
 Description:
 
@@ -33,17 +32,20 @@ It also stores them in a tabular file which can then be accessed.
 
 Instructions: 
 
-Replace the directory variable to apply it to any directroy.
-Change FileName, to name the output file.
+Run the script. It will create a function.
+It needs to be passed a directory with the locations of 
+the tree files.
+Optional arguments are the ouput file name and the directory
+in which the results should be put. 
 
 """
 
 ## INPUT 
 
-#Directory = "/home/gideon/Documents/mphil_internship/Trees/*/*" 
+# directory = "/home/gideon/Documents/mphil_internship/Trees/*/*" 
 
 # It will save the file in the current directory
-#FileName = "tree_stats_output.csv"
+# filename = "tree_stats_output.csv"
     
 
     
@@ -65,7 +67,8 @@ import csv
 
 ### THE FUNCTION ###
 
-def tree_stats(directory, filename="tree_stats_output.csv"):
+def tree_stats(directory, filename="tree_stats_output.csv", 
+               output_directory = os.getcwd()):
     
     ## LOOP PREPARATION
 
@@ -195,9 +198,11 @@ def tree_stats(directory, filename="tree_stats_output.csv"):
     colnames = ["Directory", "Length", "Biggest Branch", "Smallest Branch", 
                   "Farthest Leaf", "Closest Leaf", "# of Leaves", 
                   "# of Species", "# of Paralogs", "# of Human seqs"]
+                  
+    output_file = ''.join([output_directory + "/" + filename ])
     
     # wrtite it to a file
-    with open(filename, 'w') as csvfile:
+    with open(output_file, 'w') as csvfile:
         writer = csv.writer(csvfile, delimiter=",", dialect="excel")
         writer.writerow(colnames)
         writer.writerows(tree_list)

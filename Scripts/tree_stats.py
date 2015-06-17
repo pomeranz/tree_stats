@@ -73,6 +73,9 @@ def tree_stats(directory, filename="tree_stats_output.csv",
                output_directory = os.getcwd()):
     
     ## LOOP PREPARATION
+    
+    # match all the sub-directories in the directory
+    directory = ''.join([directory + "/*/*"])
 
     # create a regexp to match for later
     ens_RE = re.compile("[A-Z]*")
@@ -208,39 +211,35 @@ def tree_stats(directory, filename="tree_stats_output.csv",
         writer = csv.writer(csvfile, delimiter=",", dialect="excel")
         writer.writerow(colnames)
         writer.writerows(tree_list)
-        
-    ## Return
-    return("Finished, the file output is in your current worknig directory")
-    
-    
+            
     ## END OF FUNCTION
     
 #-----------------------------------------------------------------------------#
-    
+
 # create the argparse so that it can be run from the command-line. 
     
-parser = argparse.ArgumentParser(prog="tree_stats", prefix_chars='-',
+parser = argparse.ArgumentParser(prog="tree_stats",
                                  description='Calculates tree statistics')
 
 # add directroy argument, must be given
-parser.add_argument("directory", metavar="Tree Directory", action="store")
+parser.add_argument("--directory", metavar="Tree Directory", type=str)
 
 # give output file name, optional
-parser.add_argument("-filename", metavar="Output file name", action="store", 
+parser.add_argument("--outname", metavar="Output file name", action="store", 
                     default="tree_stats_output.csv", required=False,
                     dest="filename")
 
 # add optional argument for output directory
-parser.add_argument("-outdir", metavar="Output Directory", action="store",
+parser.add_argument("--outdir", metavar="Output Directory", action="store",
                     default=os.getcwd(), required=False, 
                     dest="output_directory")
 
-parser.parse_args(["-filename"])
-parser.parse_args(["-outdir"])
+args = parser.parse_args()
 
 
 ## CALL THE FUNCTION
 
-tree_stats(directory= directory, filename=filename, 
-           output_directory=output_directory)
-    
+tree_stats(args.directory)
+
+## TELL THE USER WE ARE DONE
+print("Finished, the file output is in your current/specified working directory")

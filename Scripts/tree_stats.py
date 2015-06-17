@@ -75,7 +75,7 @@ def tree_stats(directory, filename="tree_stats_output.csv",
     ## LOOP PREPARATION
     
     # match all the sub-directories in the directory
-    directory = ''.join([directory + "/*/*"])
+    directory = ''.join([directory + "*/*"])
 
     # create a regexp to match for later
     ens_RE = re.compile("[A-Z]*")
@@ -239,7 +239,7 @@ args = parser.parse_args()
 
 ## CALL THE FUNCTION
 
-tree_stats(args.directory)
+tree_stats(args.directory, args.filename, args.output_directory)
 
 ## TELL THE USER WE ARE DONE
 print("Finished, the file output is in your current/specified working directory")

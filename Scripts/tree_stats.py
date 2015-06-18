@@ -40,6 +40,14 @@ in which the results should be put.
 
 """
 
+"""
+REWORK
+
+fix human sequences 
+Human seq identifier not just ENS
+
+
+"""
 ## INPUT 
 
 # directory = "/home/gideon/Documents/mphil_internship/Trees/*/*" 
@@ -133,12 +141,14 @@ def tree_stats(directory, filename="tree_stats_output.csv",
         # max length
         max_leaf = current_tree.get_farthest_leaf()
         #add to list
-        tree.append(max_leaf)
+        tree.append(max_leaf[0])
+        tree.append(max_leaf[1])
         
         # min length
         min_leaf = current_tree.get_closest_leaf()
         # add to list
-        tree.append(min_leaf)
+        tree.append(min_leaf[0])
+        tree.append(min_leaf[1])
         
         
         # NUMBER OF LEAVES
@@ -176,13 +186,13 @@ def tree_stats(directory, filename="tree_stats_output.csv",
         ## NUMBER OF HUMAN SEQUENCES
         
         # count the number of only ENS for human seqs
-        human_seqs = species_ids.count("ENS")
+        human_seqs = species_ids.count("ENSP")
         
         if human_seqs == 0:
             no_human_seqs = 0
             tree.append(no_human_seqs)
         else:
-            no_human_seqs = len(human_seqs)
+            no_human_seqs = human_seqs
             tree.append(no_human_seqs)
         
         
@@ -201,8 +211,10 @@ def tree_stats(directory, filename="tree_stats_output.csv",
     
     # create the column names
     colnames = ["Directory", "Length", "Biggest Branch", "Smallest Branch", 
-                  "Farthest Leaf", "Closest Leaf", "# of Leaves", 
-                  "# of Species", "# of Paralogs", "# of Human seqs"]
+                  "Farthest Leaf Name", "Distance of farthest leaf", 
+                  "Closest Leaf Name", "Distance of closest leaf", 
+                  "# of Leaves", "# of Species", "# of Paralogs", 
+                  "# of Human seqs"]
                   
     output_file = ''.join([output_directory + "/" + filename ])
     

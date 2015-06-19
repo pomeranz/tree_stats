@@ -83,7 +83,7 @@ def tree_stats(directory, filename="tree_stats_output.csv",
     ## LOOP PREPARATION
     
     # match all the sub-directories in the directory
-    directory = ''.join([directory + "*/*"])
+    directory = ''.join([directory + "*/*.nh"])
 
     # create a regexp to match for later
     ens_RE = re.compile("[A-Z]*")
@@ -104,6 +104,7 @@ def tree_stats(directory, filename="tree_stats_output.csv",
         current_tree_directory = p
         
         # create ete tree object
+        print current_tree_directory
         current_tree = Tree(newick = current_tree_directory)
         
         # Add tree directory for identification

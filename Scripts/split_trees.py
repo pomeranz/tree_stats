@@ -28,8 +28,10 @@ argparser.add_argument('--thr', metavar='value', type=float, default=0.6)
 
 def filter_clades(species, clade_names):
     clade_names = set(clade_names)
-    clades = { cl: [] for cl in clade_names }
-
+    clades = {}
+    for cl in clade_names:
+        clades[cl] = []
+        
     parent = None
     for sp in species:
         sp_clades = clade_names.intersection(get_clades(sp))

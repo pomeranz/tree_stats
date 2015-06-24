@@ -13,10 +13,14 @@ import utils
 
 argparser = ArgumentParser()
 
+# EMF file is /nfs/research2/goldman/gregs/slr_pipeline/data/ens/78/Compara.78.protein.nhx
+# Clade is Eutheria
+# species_clade is
+# /nfs/research2/goldman/gregs/slr_pipeline/data/ens/78/clades.pk
 argparser.add_argument('--emf', metavar='emf_file', type=str, required=True)
 argparser.add_argument('--clade', metavar='clade_name', type=str, required=True)
-argparser.add_argument('--treeroot', metavar='tree_root', type=str, required=True)
-argparser.add_argument('--imgroot', metavar='img_root', type=str, required=True)
+# argparser.add_argument('--treeroot', metavar='tree_root', type=str, required=True)
+# argparser.add_argument('--imgroot', metavar='img_root', type=str, required=True)
 argparser.add_argument('--outroot', metavar='out_root', type=str, required=True)
 argparser.add_argument('--species_cache', metavar='cache_file', type=str, required=True)
 argparser.add_argument('--thr', metavar='value', type=float, default=0.6)
@@ -85,7 +89,6 @@ def split_tree(intree, tcclist):
     seqsets, subtrees = [], []
 
     trees = []
-    to_remove = []
     for node in intree.traverse("postorder"):
         if node.dist > 100:
             node.detach()
@@ -112,14 +115,14 @@ def split_tree(intree, tcclist):
     for tree in trees:
         for node in tree.traverse("postorder"):
             children = node.get_children()
-            if any([ n.done for n in children ]):
+            # changed any to all. 
+            if all([ n.done for n in children ]):
                 # if not all([ n.done for n in children ]):
                 #     print "Warning!"
                 node.add_features(done=True)
                 continue
 
             if len(children) and any([ n.split for n in children ]):
-                seqset = []
                 for ch in children:
                     if ch.split:
                         seqsets.append([ (n.name, n.species) for n in ch.get_leaves() ])
@@ -161,8 +164,8 @@ def main():
 
     emf_file = args.emf
     out_root = args.outroot
-    img_root = args.imgroot
-    tree_root = args.treeroot
+    # img_root = args.imgroot
+    # tree_root = args.treeroot
     clades_pickle = args.species_cache
 
     all_species = utils.ens_get("/info/species/")["species"]
@@ -186,10 +189,10 @@ def main():
     tree_id = 1
     for tree in emf.EMF(emf_file):
         print tree_id
-        treedir = path.join(tree_root, str(tree_id)[:2])
-        utils.check_dir(treedir)
+        # treedir = path.join(tree_root, str(tree_id)[:2])
+        # utils.check_dir(treedir)
 
-        tree.write(outfile=path.join(treedir, "{}.nh".format(tree_id)))
+        # tree.write(outfile=path.join(treedir, "{}.nh".format(tree_id)))
 
         seqsets, subtrees = split_tree(tree, TL)
         outdir = path.join(out_root, args.clade, str(tree_id)[:2])

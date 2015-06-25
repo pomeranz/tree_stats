@@ -209,11 +209,11 @@ def main():
 
         set_id = 1
         for seqset, subtree in zip(seqsets, subtrees):
-            outfile = open(path.join(outdir, "{}_{}.tab".format(tree_id, set_id)), 'w')
+            outfile = open(path.join(outdir, "{0}_{1}.tab".format(tree_id, set_id)), 'w')
             for seqid in seqset:
                 print >>outfile, '\t'.join(seqid)
 
-            subtree.write(outfile=path.join(outdir, "{}_{}.nh".format(tree_id, set_id)), 
+            subtree.write(outfile=path.join(outdir, "{0}_{1}.nh".format(tree_id, set_id)), 
                           format=6)
             set_id += 1
 

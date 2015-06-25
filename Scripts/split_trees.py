@@ -123,12 +123,15 @@ def split_tree(intree, tcclist):
                 #     print "Warning!"
                 node.add_features(done=True)
                 continue
-
-            if len(children) and any([ n.split for n in children ]):
-                for ch in children:
-                    if ch.split:
-                        seqsets.append([ (n.name, n.species) for n in ch.get_leaves() ])
-                        subtrees.append(ch)
+             ##rework for if all the childs meet criteria add node
+            if len(children) and all([ n.split for n in children ]):
+                                
+                seqsets.append([ (n.name, n.species) for n in node.get_leaves() ])
+                subtrees.append(node)
+                # for ch in children:
+                   # if ch.split:
+                       # seqsets.append([ (n.name, n.species) for n in ch.get_leaves() ])
+                       # subtrees.append(ch)
                 node.add_features(done=True)
             else:
                 if tcclist.check(node):

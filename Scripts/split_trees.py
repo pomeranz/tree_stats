@@ -118,7 +118,7 @@ def split_tree(intree, tcclist):
         for node in tree.traverse("postorder"):
             children = node.get_children()
             # changed any to all. 
-            if all([ n.done for n in children ]):
+            if any([ n.done for n in children ]):
                 # if not all([ n.done for n in children ]):
                 #     print "Warning!"
                 node.add_features(done=True)

@@ -104,7 +104,6 @@ def tree_stats(directory, filename="tree_stats_output.csv",
         current_tree_directory = p
         
         # create ete tree object
-        print current_tree_directory
         current_tree = Tree(newick = current_tree_directory)
         
         # Add tree directory for identification

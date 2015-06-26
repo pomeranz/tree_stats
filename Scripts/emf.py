@@ -57,7 +57,9 @@ class EMF:
 
 # Test code
 if __name__ == "__main__":
-    emf = EMF("/Users/greg/Downloads/Compara.73.protein.nhx.emf")
+    # emf = EMF("/Users/greg/Downloads/Compara.73.protein.nhx.emf")
+    # debugging on my laptop
+    emf = EMF("/home/gideon/Documents/mphil_internship/Compara.78.protein.nhx")
 
     # it = iter(emf)
     # print type(it.next())

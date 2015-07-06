@@ -24,6 +24,8 @@ argparser.add_argument('--clade', metavar='clade_name', type=str, required=True)
 argparser.add_argument('--outroot', metavar='out_root', type=str, required=True)
 argparser.add_argument('--species_cache', metavar='cache_file', type=str, required=True)
 argparser.add_argument('--thr', metavar='value', type=float, default=0.6)
+# add argument if you want prefixes 
+argparser.add_argument('--prefix', metavar='add prefix?', type=bool, required=True, default=False)
 
 
 def filter_clades(species, clade_names):
@@ -87,7 +89,7 @@ class TCCList(object):
 
         return True
 
-def split_tree(intree, tcclist):
+def split_tree(intree, tcclist,prefix):
     seqsets, subtrees = [], []
 
     trees = []
@@ -156,19 +158,20 @@ def split_tree(intree, tcclist):
                     node.add_features(split=False)
 
                 node.add_features(done=False)
-                
-    index = 1
-    for subtree in subtrees:
-        if index == len(subtrees):
-            for identifier in subtree.traverse():
-                prefix = "".join(["D" + str(index) + "_"])
-                identifier.name = "".join([prefix + identifier.name])
-            index = 1
-        else:
-            for identifier in subtree.traverse():
-                prefix = "".join(["D" + str(index) + "_"])
-                identifier.name = "".join([prefix + identifier.name])
-        index += 1
+    
+    if prefix == True:            
+        index = 1
+        for subtree in subtrees:
+            if index == len(subtrees):
+                for identifier in subtree.traverse():
+                    prefix = "".join(["D" + str(index) + "_"])
+                    identifier.name = "".join([prefix + identifier.name])
+                index = 1
+            else:
+                for identifier in subtree.traverse():
+                    prefix = "".join(["D" + str(index) + "_"])
+                    identifier.name = "".join([prefix + identifier.name])
+            index += 1
 
     return seqsets, subtrees
 
@@ -201,6 +204,7 @@ def main():
     # img_root = args.imgroot
     # tree_root = args.treeroot
     clades_pickle = args.species_cache
+    prefix = args.prefix
 
     all_species = utils.ens_get("/info/species/")["species"]
     all_species_names = [ it["name"].replace("_", " ") for it in all_species ]
@@ -228,7 +232,7 @@ def main():
 
         # tree.write(outfile=path.join(treedir, "{}.nh".format(tree_id)))
 
-        seqsets, subtrees = split_tree(tree, TL)
+        seqsets, subtrees = split_tree(tree, TL, prefix)
         outdir = path.join(out_root, args.clade, str(tree_id)[:2])
         utils.check_dir(outdir)
 

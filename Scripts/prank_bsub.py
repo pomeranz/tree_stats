@@ -68,7 +68,7 @@ for infile in glob(path.join(inroot, args.clade, "*", "*.fa")):
         else:
             os.remove(logfile)
 
-    p = Popen(['bsub', '-R', 'rusage[tmp=512]', '-o'+logfile, '-g', '/prank',
+    p = Popen(['bsub', '-R', 'rusage[tmp=512]', '-o'+logfile,
                '-cwd /tmp', prank])
         
     p.wait()

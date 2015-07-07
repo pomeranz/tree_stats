@@ -21,9 +21,9 @@ argparser.add_argument('--rerun', action='store_true')
 args = argparser.parse_args()
 
 if args.treeroot:
-    prank_cmd = "prank -d={} -t={} -o={} -prunetree -" + args.mode
+    prank_cmd = "prank -d={0} -t={1} -o={2} -prunetree -" + args.mode
 else:
-    prank_cmd = "prank -d={} -o={} -prunetree -codon" + args.mode
+    prank_cmd = "prank -d={0} -o={1} -prunetree -codon" + args.mode
 
 inroot = args.inroot
 treeroot = args.treeroot

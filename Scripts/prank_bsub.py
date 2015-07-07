@@ -1,5 +1,5 @@
 from subprocess import Popen
-from glob import glob
+import glob
 import os
 from os import path
 import argparse

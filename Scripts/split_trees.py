@@ -25,7 +25,7 @@ argparser.add_argument('--outroot', metavar='out_root', type=str, required=True)
 argparser.add_argument('--species_cache', metavar='cache_file', type=str, required=True)
 argparser.add_argument('--thr', metavar='value', type=float, default=0.6)
 # add argument if you want prefixes 
-argparser.add_argument('--prefix', metavar='add prefix?', type=bool, required=True, default=False)
+argparser.add_argument('--prefix', metavar='add prefix?', type=str, required=True)
 
 
 def filter_clades(species, clade_names):
@@ -89,7 +89,7 @@ class TCCList(object):
 
         return True
 
-def split_tree(intree, tcclist,prefix):
+def split_tree(intree, tcclist, prefix):
     seqsets, subtrees = [], []
 
     trees = []
@@ -159,7 +159,7 @@ def split_tree(intree, tcclist,prefix):
 
                 node.add_features(done=False)
     
-    if prefix == True:            
+    if prefix == "True":            
         index = 1
         for subtree in subtrees:
             if index == len(subtrees):
@@ -172,6 +172,7 @@ def split_tree(intree, tcclist,prefix):
                     prefix = "".join(["D" + str(index) + "_"])
                     identifier.name = "".join([prefix + identifier.name])
             index += 1
+
 
     return seqsets, subtrees
 

@@ -35,7 +35,7 @@ utils.check_dir(path.join(logroot, args.clade))
 utils.check_dir(alndir)
 utils.check_dir(path.join(alndir, args.clade))
 
-for infile in glob(path.join(inroot, args.clade, "*", "*.fa")):
+for infile in glob.glob(path.join(inroot, args.clade, "*", "*.fa")):
     print infile
     basename = path.basename(infile).partition('.')[0]
     prefix = basename.partition('_')[0][:2]

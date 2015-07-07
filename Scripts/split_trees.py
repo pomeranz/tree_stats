@@ -116,13 +116,8 @@ def split_tree(intree, tcclist, prefix):
             print "MISSING SPECIES", node.name
             print node.get_children()
     
-    
-    
+
     for tree in trees:
-        
-         # add prefix identifier
-        #index = 1
-        #prefix = "".join(["D" + str(index) + "_"])
         
         for node in tree.traverse("postorder"):
             children = node.get_children()
@@ -136,21 +131,9 @@ def split_tree(intree, tcclist, prefix):
             if len(children) and all([ n.split for n in children ]):
                                 
                 seqsets.append([ (n.name, n.species) for n in node.get_leaves() ])
-                # add the prefix for the particular tree
-                # this method doesnt work...
-                # node.get_leaf_names = [prefix + leafname for leafname in node.get_leaf_names()]
-                #for identifier in node.traverse():
-                    #identifier.name = "".join([prefix + identifier.name])
-                    
-                
                 subtrees.append(node)
-                # for ch in children:
-                   # if ch.split:
-                       # seqsets.append([ (n.name, n.species) for n in ch.get_leaves() ])
-                       # subtrees.append(ch)
+
                 node.add_features(done=True)
-                # if the tree was adda
-                #index += 1
             else:
                 if tcclist.check(node):
                     node.add_features(split=True)
@@ -158,6 +141,12 @@ def split_tree(intree, tcclist, prefix):
                     node.add_features(split=False)
 
                 node.add_features(done=False)
+                
+    # add the prefix for the particular tree
+                # this method doesnt work...
+                # node.get_leaf_names = [prefix + leafname for leafname in node.get_leaf_names()]
+                #for identifier in node.traverse():
+                    #identifier.name = "".join([prefix + identifier.name])
     
     if prefix == "True":            
         index = 1

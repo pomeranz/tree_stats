@@ -147,23 +147,19 @@ def split_tree(intree, tcclist, prefix):
                 # node.get_leaf_names = [prefix + leafname for leafname in node.get_leaf_names()]
                 #for identifier in node.traverse():
                     #identifier.name = "".join([prefix + identifier.name])
-    
-    if prefix == "True":            
-        index = 1
+                
+    if prefix == "True":               
         for subtree in subtrees:
-            if index == len(subtrees):
-                for identifier in subtree.traverse():
+            index = 1
+            for child in subtree.get_children():
+                for identifier in child.iter_leaves():
                     prefix = "".join(["D" + str(index) + "_"])
                     identifier.name = "".join([prefix + identifier.name])
-                index = 1
-            else:
-                for identifier in subtree.traverse():
-                    prefix = "".join(["D" + str(index) + "_"])
-                    identifier.name = "".join([prefix + identifier.name])
-            index += 1
-
+                index += 1
 
     return seqsets, subtrees
+
+
 
 colours = { -1: "black", 0: "red", 1: "green", 2: "blue", 3: "purple", 4: "orange", 5: "yellow", 6: "grey", 7: "#009999",
             8: "#FF7400"}

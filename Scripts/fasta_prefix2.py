@@ -3,12 +3,18 @@
 Created on Mon Jul 13 11:21:04 2015
 
 @author: gideon
+
+Rewrite:
+Add another file where you write the output too. 
+
+
 """
 
+import os
 from Bio import SeqIO
 from argparse import ArgumentParser
 from ete2 import Tree
-# import re 
+# import re
 from glob import glob
 
 
@@ -17,12 +23,17 @@ argparser = ArgumentParser()
 # commands for function
 argparser.add_argument("--fasta", metavar="Fasta files directory", type=str, required=True)
 argparser.add_argument("--tree", metavar="Tree files directory", type=str, required=True)
+argparser.add_argument("--outdir", metavar="Directory to write the new file to", type=str, required=True)
 
 
-def fasta_prefix(fasta, tree):
+def fasta_prefix(fasta, tree, outdir):
     
     tree_dir = ''.join([tree + "*/*.nh"])
     fasta_dir = ''.join([fasta + "*/*prank.best.fas"])
+    
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+    
     
     tree_files = sorted(glob(tree_dir))
     fasta_files = sorted(glob(fasta_dir))
@@ -35,29 +46,49 @@ def fasta_prefix(fasta, tree):
         current_fasta = fasta_files[file]
         current_tree = tree_files[file]
         
-        with open (current_fasta, "r+") as fas:
+        out_sub_dir = "".join(outdir + current_fasta.split("/")[6])
+        
+        if not os.path.exists(out_sub_dir):
+            os.makedirs(out_sub_dir)
+        
+        out_file = "".join(out_sub_dir + "/" + current_fasta.split("/")[7])
+        out_file = open(out_file, "w+")
+        
+        with open (current_fasta, "r") as fas:
             for line in fas:
                 if line.startswith(">"):
-                    line = line[1:] # skip > character
+                    line = line[1:].rstrip() # skip > character
                     
                     tree_ids = Tree(newick=current_tree)
                     
                     for tree_id in tree_ids.iter_leaf_names():
-                        if line in tree_id:
-                            print True
-        
-                            new_line = tree_id
+                        #print line
+                        #print tree_id
+                        
+                        
+                        if tree_id.find(line) != -1:
+                        # if line in tree_id:
                             print line
-                            line.replace(line, new_line)
-                            break
+                            print tree_id                            
+                            print True
+                            new_line = tree_id
+                            
+                            out_file.write("".join(">" + new_line + "\n"))
+                            #print line
+                            #line.replace(line, new_line)
+                            #break
+                else:
+                    out_file.write(line)
         fas.close()
+        out_file.close()
         
 args = argparser.parse_args()
 
 fasta = args.fasta
 tree = args.tree
+outdir = args.outdir
 
-fasta_prefix(fasta,tree)
+fasta_prefix(fasta,tree, outdir)
 
 print("All done, the fasta file names should match the tree IDs")
 

@@ -7,11 +7,14 @@ Created on Mon Jul 13 11:21:04 2015
 Rewrite:
 Add another file where you write the output too. 
 
-
+To test:
+tree = "/home/gideon/Documents/mphil_internship/fas_pref_test/Eutheria/"
+fasta = "/home/gideon/Documents/mphil_internship/fas_pref_test2/"
+outdir = "/home/gideon/Documents/mphil_internship/fasta_prefix_out"
 """
 
 import os
-from Bio import SeqIO
+# from Bio import SeqIO
 from argparse import ArgumentParser
 from ete2 import Tree
 # import re
@@ -38,7 +41,31 @@ def fasta_prefix(fasta, tree, outdir):
     tree_files = sorted(glob(tree_dir))
     fasta_files = sorted(glob(fasta_dir))
     
-    for file in range(len(fasta_files)-1):
+    # make sure that both directories have the same amount of files
+    if len(tree_files) != len(fasta_files):
+        index = 0
+        while index <= len(tree_files)-1:
+            current_fasta = fasta_files[index]
+            current_fasta = current_fasta.split("/")
+            current_fasta = current_fasta[7]
+            current_fasta = current_fasta.split("_prank")
+            current_fasta = current_fasta[0]
+            
+            current_tree = tree_files[index]
+            current_tree = current_tree.split("/")
+            current_tree = current_tree[len(current_tree)-1]
+            current_tree = current_tree.split(".")
+            current_tree = current_tree[0]
+            if current_fasta != current_tree:
+                tree_files.remove(tree_files[index])
+                index = index - 1
+            print index
+            index += 1
+    
+    #tree_files = sorted(glob(tree_dir))
+    fasta_files = sorted(glob(fasta_dir))
+    
+    for file in range(len(fasta_files)):
         
         # print progress
         print("".join("Finished " + str(file + 1) + " out of " + str(len(fasta_files))))        
@@ -46,7 +73,7 @@ def fasta_prefix(fasta, tree, outdir):
         current_fasta = fasta_files[file]
         current_tree = tree_files[file]
         
-        out_sub_dir = "".join(outdir + current_fasta.split("/")[6])
+        out_sub_dir = "".join(outdir + "/" + current_fasta.split("/")[6])
         
         if not os.path.exists(out_sub_dir):
             os.makedirs(out_sub_dir)
@@ -68,9 +95,9 @@ def fasta_prefix(fasta, tree, outdir):
                         
                         if tree_id.find(line) != -1:
                         # if line in tree_id:
-                            print line
-                            print tree_id                            
-                            print True
+                            #print line
+                            #print tree_id                            
+                            #print True
                             new_line = tree_id
                             
                             out_file.write("".join(">" + new_line + "\n"))

@@ -4,8 +4,17 @@ Created on Mon Jul 13 11:21:04 2015
 
 @author: gideon
 
-Rewrite:
-Add another file where you write the output too. 
+Description:
+This script takes the output of PRANK and formats everything
+so that the alignment can be used for tdg09
+- Prefixes
+- Format conversion (fasta -> phylip-relaxed)
+
+Side note: It creates an intermediate directory with just the prefixes 
+changed. 
+
+Usage:
+python Scripts/format_align.py --fasta --tree --outdir --final_out
 
 To test:
 tree = "/home/gideon/Documents/mphil_internship/fas_pref_test/Eutheria/"
@@ -19,6 +28,8 @@ from argparse import ArgumentParser
 from ete2 import Tree
 # import re
 from glob import glob
+from Bio import AlignIO
+
 
 
 argparser = ArgumentParser()
@@ -27,9 +38,10 @@ argparser = ArgumentParser()
 argparser.add_argument("--fasta", metavar="Fasta files directory", type=str, required=True)
 argparser.add_argument("--tree", metavar="Tree files directory", type=str, required=True)
 argparser.add_argument("--outdir", metavar="Directory to write the new file to", type=str, required=True)
+argparser.add_argument("--final_out", metavar="Directory to write the new file to", type=str, required=True)
 
 
-def fasta_prefix(fasta, tree, outdir):
+def fasta_prefix(fasta, tree, outdir, final_out):
     
     tree_dir = ''.join([tree + "*/*.nh"])
     fasta_dir = ''.join([fasta + "*/*prank.best.fas"])
@@ -78,8 +90,8 @@ def fasta_prefix(fasta, tree, outdir):
         if not os.path.exists(out_sub_dir):
             os.makedirs(out_sub_dir)
         
-        out_file = "".join(out_sub_dir + "/" + current_fasta.split("/")[7])
-        out_file = open(out_file, "w+")
+        out_file_temp = "".join(out_sub_dir + "/" + current_fasta.split("/")[7])
+        out_file = open(out_file_temp, "w+")
         
         with open (current_fasta, "r") as fas:
             for line in fas:
@@ -101,65 +113,36 @@ def fasta_prefix(fasta, tree, outdir):
                             new_line = tree_id
                             
                             out_file.write("".join(">" + new_line + "\n"))
-                            #print line
-                            #line.replace(line, new_line)
-                            #break
+                            
                 else:
                     out_file.write(line)
+            
         fas.close()
         out_file.close()
+        
+        input_handle = open(out_file_temp, "rU")
+        out_sub_dir = "".join(final_out + "/" + current_fasta.split("/")[6])
+        
+        if not os.path.exists(out_sub_dir):
+            os.makedirs(out_sub_dir)
+        
+        out_file = "".join(out_sub_dir + "/" + current_fasta.split("/")[7])
+        output_handle = open(out_file, "w+")
+        
+        alignments = AlignIO.parse(input_handle, "fasta")
+        AlignIO.write(alignments, output_handle, "phylip-relaxed")
+ 
+        output_handle.close()
+        input_handle.close()
+    
         
 args = argparser.parse_args()
 
 fasta = args.fasta
 tree = args.tree
 outdir = args.outdir
+final_out = args.final_out
 
-fasta_prefix(fasta,tree, outdir)
+fasta_prefix(fasta, tree, outdir, final_out)
 
 print("All done, the fasta file names should match the tree IDs")
-
-
-
-
-"""
-for ID in SeqIO.parse(current_fasta,"fasta"):
-     tree_ids = Tree(newick=current_tree)
-     for tree_id in tree_ids.iter_leaf_names():
-         print ID.id
-         if ID.id in tree_id:
-             ID.id = tree_id
-             print(ID.id) 
-
-
-
-
-
-
-file = "/home/gideon/Documents/mphil_internship/prank_out/11_1_prank.best.fas"
-
-fast1 = SeqIO.parse(file, "fasta")
-
-for seq in SeqIO.parse(file, "fasta"):
-        
-        print seq.id
-        #SeqIO.write(seq_record, "/Users/bucephalus/Desktop/nc_pimps/raw/"+name[0]+".fas", "fasta")
-       
-
-Read in both directories
-Within directory read in correct files. 1_1.nh and 1_1.fas
-
-create a list with all the leaf names from the nh file.
-
-Loop trough fasta headers.
-
-for each header create a regexp and search for it within the list.
-The regexp greps out the 3 characters before the match = D1_ or D2_ 
-add this to the current header.
-Next header.
-
-Next fasta and nh file
-Next directory.
-
-Done!
-"""

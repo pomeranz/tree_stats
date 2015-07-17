@@ -40,6 +40,7 @@ def fasta_prefix(fasta, tree):
         for ID in SeqIO.parse(current_fasta,"fasta"):
             # create a regexp to search for in the other file
             # id_RE = re.compile(ID)
+            # print ID.id # for testing
             
             tree_ids = Tree(newick=current_tree)
             

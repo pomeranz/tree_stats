@@ -23,7 +23,7 @@ outdir = "/home/gideon/Documents/mphil_internship/fasta_prefix_out"
 """
 
 import os
-# from Bio import SeqIO
+from Bio import SeqIO
 from argparse import ArgumentParser
 from ete2 import Tree
 # import re
@@ -92,32 +92,24 @@ def fasta_prefix(fasta, tree, outdir, final_out):
         
         out_file_temp = "".join(out_sub_dir + "/" + current_fasta.split("/")[7])
         out_file = open(out_file_temp, "w+")
-        
-        with open (current_fasta, "r") as fas:
-            for line in fas:
-                if line.startswith(">"):
-                    line = line[1:].rstrip() # skip > character
-                    
-                    tree_ids = Tree(newick=current_tree)
-                    
-                    for tree_id in tree_ids.iter_leaf_names():
-                        #print line
-                        #print tree_id
-                        
-                        
-                        if tree_id.find(line) != -1:
-                        # if line in tree_id:
-                            #print line
-                            #print tree_id                            
-                            #print True
-                            new_line = tree_id
-                            
-                            out_file.write("".join(">" + new_line + "\n"))
-                            
-                else:
-                    out_file.write(line)
+                  
+        for ID in SeqIO.parse(current_fasta,"fasta"):
             
-        fas.close()
+            tree_ids = Tree(newick=current_tree)
+            for tree_id in tree_ids.iter_leaf_names():
+                
+                if tree_id.find(ID.id) != -1:
+                    print ID.id
+                    ID.id = tree_id
+                    #ID.name = ""
+                    ID.description = ""
+                    print ID.id
+                    print ID                    
+                    SeqIO.write(ID, out_file, "fasta")
+            
+                        
+            
+        #fas.close()
         out_file.close()
         
         input_handle = open(out_file_temp, "rU")

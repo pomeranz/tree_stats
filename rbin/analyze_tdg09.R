@@ -36,24 +36,30 @@ sum(lrt_results$fdr <= 0.05)
 full_results <- as.data.frame(matrix(unlist(out$FullResults), ncol=9, byrow=T), stringsAsFactors = FALSE)
 names(full_results) <- c("site", "ssfParams", "ssfLnL", "lssfParams", "lssfLnL", "deltaLnL", "dof", "lrt", "fdr")
 
-# remove rows with NA
-full_results <- full_results[apply(full_results, 1, function(x) {!("NA" %in% x) } ), ]
+# remove rows with NA not needed anymore
+# full_results <- full_results[apply(full_results, 1, function(x) {!("NA" %in% x) } ), ]
 
-# make them all to integers
-full_results <- apply(full_results, 2, function(x) as.numeric(x))
 
+# something wrong here
+# make them all to numerics
+full_results <- apply(full_results, 2, FUN=function(x) as.double(x))
+# back to data frame
 full_results <- as.data.frame(full_results)
 
 # recalculate same things for this table too
-deltaLnL = apply(full_results, 1, FUN=function(x) abs(x[6]))
-full_results$deltaLnL = deltaLnL
-lrt = apply(full_results, 1, FUN=function(x) pchisq(2*x[6], df=x[7], lower.tail=FALSE))
-full_results$lrt = lrt
-fdr_vals = apply(full_results, 1, FUN=function(x) p.adjust(x[8], method="fdr"))
+deltaLnL_vals = apply(full_results, 1, FUN=function(x) abs(x[6]))
+full_results$deltaLnL = deltaLnL_vals
+lrt_vals = apply(full_results, 1, FUN=function(x) pchisq(2*x[6], df=x[7], lower.tail=FALSE))
+full_results$lrt = lrt_vals
+#fdr_vals = apply(full_results, 1, FUN=function(x) p.adjust(full_results[,8], method="fdr"))
+fdr_vals = p.adjust(full_results[,8], method="fdr")
 full_results$fdr = fdr_vals
+
+fdr_vals[is.na(fdr_vals)] <- 1.0 # conserved locations implicitly have no evidence of non-homogeneity
 
 # Here's what we have
 head(full_results)
+
 
 # Split the sequence into 5 chunks
 sites <- out$Alignment$SiteCount
@@ -62,8 +68,10 @@ plot_ranges <- split(seq(1, sites), cut(seq(1, sites), 5))
 # Draw the plot
 par(mfrow=c(5,1), mar=c(2.0,0.5,0.5,0.5))
 for (p in 1:5) {
-  plot(1 - fdr,  xlim=c(plot_ranges[[p]][1], tail(plot_ranges[[p]], n=1)), ty='h', lwd=1, main='', xlab='', ylab='', yaxt='n', col="#1B9E77")
-  lines(which(fdr <= 0.20), 1 - fdr[fdr <= 0.20], col="#D95F02", ty='h')
+  plot(1 - fdr_vals,  xlim=c(plot_ranges[[p]][1], tail(plot_ranges[[p]], n=1)), ty='h', lwd=1, main='', xlab='', ylab='', yaxt='n', col="#1B9E77")
+  lines(which(fdr_vals <= 0.20), 1 - fdr_vals[fdr_vals <= 0.20], col="#D95F02", ty='h')
   abline(h=0.95, lty='dashed')
-  points(which(fdr <= 0.05), 1 - fdr[fdr <= 0.05], pch=20, col="#DE2D26")
+  points(which(fdr_vals <= 0.05), 1 - fdr_vals[fdr_vals <= 0.05], pch=20, col="#DE2D26")
 }
+
+

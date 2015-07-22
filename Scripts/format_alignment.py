@@ -137,6 +137,7 @@ def fasta_prefix(fasta, tree, outdir, final_out, toAA):
                         
                         #ID.seq = "".join(aa_seq + ", IUPACProtein()")
                         ID = SeqRecord(Seq(aa_seq, IUPAC.protein), id = ID.id, name = ID.name)
+                        ID.description = ""
                         print ID
                         SeqIO.write(ID, out_file, "fasta")
                         

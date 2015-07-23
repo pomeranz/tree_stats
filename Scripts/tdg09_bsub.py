@@ -19,7 +19,7 @@ from os import path
 import argparse
 import re
 
-import utils.py
+from utils import check_dir
 
 argparser = argparse.ArgumentParser()
 
@@ -44,21 +44,21 @@ tree = args.tree
 #logroot = args.logdir
 outroot = args.outroot
 
-utils.check_dir(logroot)
-utils.check_dir(outroot)
+#check_dir(logroot)
+check_dir(outroot)
 
 
-for infile in glob(path.join(inroot, "*", "*_prank.best.fas")):
+for infile in glob(path.join(alignment, "*", "*_prank.best.fas")):
         print infile
         basename = path.basename(infile).partition('.')[0]
         basename = "".join(basename.split("_")[0] + "_" + basename.split("_")[1])
         prefix = basename.partition('_')[0][:2]
         
         outdir = path.join(outroot, prefix)
-        utils.check_dir(outdir)
+        check_dir(outdir)
         outfile = path.join(outdir, basename + ".txt")
         
-        treedir = path.join(treeroot, prefix)
+        treedir = path.join(tree, prefix)
         treefile = path.join(treedir, basename + '.nh')
         
         tdg09 = tdg09_cmd.format(infile, treefile, groups, threads, outroot)        

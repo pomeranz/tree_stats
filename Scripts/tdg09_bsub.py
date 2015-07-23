@@ -35,7 +35,7 @@ argparser.add_argument('--outroot', metavar='out_root', type=str, required=True)
 
 args = argparser.parse_args()
 
-tdg09_cmd = "'java -cp /nfs/research2/goldman/pomeranz/tree_stats/Software/tdg09-1.1.1/dist/tdg09.jar tdg09.Analyse -alignment {0} -tree {1} -groups {2} -threads {3} > {4}'"
+tdg09_cmd = "'/homes/pomeranz/bin/jre1.8.0_51/bin/java -cp /nfs/research2/goldman/pomeranz/tree_stats/Software/tdg09-1.1.1/dist/tdg09.jar tdg09.Analyse -alignment {0} -tree {1} -groups {2} -threads {3} > {4}'"
 
 alignment = args.alignment
 groups = args.groups

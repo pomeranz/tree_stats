@@ -45,6 +45,7 @@ logroot = args.logdir
 outroot = args.outroot
 
 check_dir(outroot)
+check_dir(logroot)
 
 for infile in glob(path.join(alignment, "*", "*_prank.best.fas")):
         print infile

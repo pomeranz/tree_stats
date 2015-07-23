@@ -35,12 +35,12 @@ argparser.add_argument('--outroot', metavar='out_root', type=str, required=True)
 
 args = argparser.parse_args()
 
-tdg09_cmd = "java -cp dist/tdg09.jar tdg09.Analyse -alignment {0} -tree {1} -groups {3} -threads {4} > {5}"
+tdg09_cmd = "java -cp dist/tdg09.jar tdg09.Analyse -alignment {0} -tree {1} -groups {2} -threads {3} > {4}"
 
 alignment = args.alignment
 groups = args.groups
 threads = args.threads
-tree = args.tree
+treeroot = args.tree
 #logroot = args.logdir
 outroot = args.outroot
 
@@ -58,7 +58,7 @@ for infile in glob(path.join(alignment, "*", "*_prank.best.fas")):
         check_dir(outdir)
         outfile = path.join(outdir, basename + ".txt")
         
-        treedir = path.join(tree, prefix)
+        treedir = path.join(treeroot, prefix)
         treefile = path.join(treedir, basename + '.nh')
         
         tdg09 = tdg09_cmd.format(infile, treefile, groups, threads, outroot)        

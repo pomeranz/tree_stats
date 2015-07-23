@@ -59,8 +59,9 @@ for infile in glob(path.join(alignment, "*", "*_prank.best.fas")):
         
         logdir = path.join(logroot, prefix)
         check_dir(logroot)
+        logfile = open(path.join(logdir, basename + '.log'), "w")
+        logfile.close()
         
-        logfile = path.join(logdir, basename + '.log')
         
         
         treedir = path.join(treeroot, prefix)

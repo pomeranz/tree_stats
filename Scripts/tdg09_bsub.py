@@ -59,7 +59,7 @@ for infile in glob(path.join(alignment, "*", "*_prank.best.fas")):
         check_dir(logroot)
         
         logfile = path.join(logdir, basename + '.log')
-        errfile = path.join(logdir, args.clade, basename + '.err')
+        
         
         treedir = path.join(treeroot, prefix)
         treefile = path.join(treedir, basename + '.nh')

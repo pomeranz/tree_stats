@@ -23,7 +23,7 @@ import utils.py
 
 argparser = argparse.ArgumentParser()
 
-argparser.add_argument("--alignment", -metavar="Alignment file", type=str, required=True)
+argparser.add_argument("--alignment", metavar="Alignment file", type=str, required=True)
 argparser.add_argument("--groups", metavar="Prefixes", type=str, required=True)
 argparser.add_argument("--threads", metavar="No. of threads", type=str, required=True)
 argparser.add_argument("--tree", metavar="Tree file", type=str, required=True)

@@ -10,8 +10,6 @@ this script submits tdg09 jobs to the EBI cluster.
 Usage:
 python Scripts/tdg09_bsub.py --alignment [] --groups [] --threads [] --tree [] --logdir []
 
-Ok
-
 """
 
 from subprocess import Popen
@@ -37,7 +35,7 @@ argparser.add_argument('--outroot', metavar='out_root', type=str, required=True)
 
 args = argparser.parse_args()
 
-tdg09_cmd = "'java -cp Software/tdg09-1.1.1/dist/tdg09.jar tdg09.Analyse -alignment {0} -tree {1} -groups {2} -threads {3} > {4}'"
+tdg09_cmd = "'java -cp /nfs/research2/goldman/pomeranz/tree_stats/Software/tdg09-1.1.1/dist/tdg09.jar tdg09.Analyse -alignment {0} -tree {1} -groups {2} -threads {3} > {4}'"
 
 alignment = args.alignment
 groups = args.groups

@@ -56,7 +56,7 @@ for infile in glob(path.join(alignment, "*", "*_prank.best.fas")):
         check_dir(outdir)
         outfile = path.join(outdir, basename + ".txt")
         
-        logdir = path.join(logroot, args.clade, prefix)
+        logdir = path.join(logroot, prefix)
         check_dir(logroot)
         
         logfile = path.join(logdir, basename + '.log')

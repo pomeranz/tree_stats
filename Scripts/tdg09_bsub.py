@@ -10,6 +10,8 @@ this script submits tdg09 jobs to the EBI cluster.
 Usage:
 python Scripts/tdg09_bsub.py --alignment [] --groups [] --threads [] --tree [] --logdir []
 
+Ok
+
 """
 
 from subprocess import Popen

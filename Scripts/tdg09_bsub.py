@@ -44,7 +44,7 @@ treeroot = args.tree
 logroot = args.logdir
 outroot = args.outroot
 
-checkdir(outroot)
+check_dir(outroot)
 
 for infile in glob(path.join(alignment, "*", "*_prank.best.fas")):
         print infile

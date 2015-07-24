@@ -66,7 +66,7 @@ for infile in glob(path.join(alignment, "*", "*_prank.best.fas")):
         
         tdg09 = tdg09_cmd.format(infile, treefile, groups, threads, outfile)        
         
-        p = Popen(['bsub', '-n 2', '-R', 'rusage[tmp=512]', '-o'+logfile, 
+        p = Popen(['bsub', '-R', 'rusage[tmp=512]', '-o'+logfile, 
                    tdg09])
         
         p.wait()

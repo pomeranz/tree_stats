@@ -64,9 +64,9 @@ for infile in glob(path.join(alignment, "*", "*_prank.best.fas")):
         treedir = path.join(treeroot, prefix)
         treefile = path.join(treedir, basename + '.nh')
         
-        tdg09 = tdg09_cmd.format(infile, treefile, groups, threads, outfile)        
+        tdg09 = tdg09_cmd.format(infile, treefile, groups, threads, logfile)        
         
-        p = Popen(['bsub', '-R', 'rusage[tmp=512]', '-o'+logfile, 
+        p = Popen(['bsub', '-R', 'rusage[tmp=512]', '-o'+outfile, 
                    tdg09])
         
         p.wait()

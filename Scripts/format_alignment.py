@@ -25,6 +25,7 @@ toAA = True
 """
 
 import os
+from os import path
 from Bio import SeqIO
 from argparse import ArgumentParser
 from ete2 import Tree
@@ -153,7 +154,12 @@ def fasta_prefix(fasta, tree, outdir, final_out, toAA):
         if not os.path.exists(out_sub_dir):
             os.makedirs(out_sub_dir)
         
-        out_file = "".join(out_sub_dir + "/" + current_fasta.split("/")[7])
+        
+        basename = path.basename(current_fasta).partition('.')[0]
+        basename = "".join(basename.split("_")[0] + "_" + basename.split("_")[1])
+        out_file = path.join(out_sub_dir, basename + ".phy")
+        
+        # out_file = "".join(out_sub_dir + "/" + current_fasta.split("/")[7])
         output_handle = open(out_file, "w+")
         
         alignments = AlignIO.parse(input_handle, "fasta")

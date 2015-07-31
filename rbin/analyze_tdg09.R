@@ -2,8 +2,8 @@
 
 library(yaml)
 
-# read in the tdg09 output file
-out <- yaml.load_file(input='/home/gideon/Documents/mphil_internship/tdg09_test.txt')
+# read in the tdg09 output file # can be changed
+out <- yaml.load_file(input='/home/gideon/Documents/mphil_internship/tdg09_11_1_aa.txt')
 
 # summary 
 summary(out)
@@ -24,8 +24,9 @@ lrt_results[4] = lrt
 
 # calculate4 correct fdr
 fdr_vals = apply(lrt_results, 1, FUN=function(x) p.adjust(x[4], method="fdr"))
+fdr_val = p.adjust(lrt_results[,4], method="fdr")
 # assign
-lrt_results[5] = fdr_vals
+lrt_results[5] = fdr_val
 
 head(lrt_results)
 

@@ -143,10 +143,10 @@ def format_alignment(fasta, tree, outdir):
         
         phy_out_subdir = path.join(phy_out_dir, prefix)
         check_dir(phy_out_subdir)
-        phy_out_file_path = path.join(phy_out_subdir, "".join(basename + ".fa"))
+        phy_out_file_path = path.join(phy_out_subdir, "".join(basename + ".phy"))
         phy_AA_out_subdir = path.join(phy_AA_out_dir, prefix)
         check_dir(phy_AA_out_subdir)
-        phy_AA_out_file_path = path.join(phy_AA_out_subdir, "".join(basename + ".fa"))
+        phy_AA_out_file_path = path.join(phy_AA_out_subdir, "".join(basename + ".phy"))
 
         fasta_alignment = open(fasta_out_file_path, "rU")
         fasta_AA_alignment = open(fasta_AA_out_file_path, "rU")

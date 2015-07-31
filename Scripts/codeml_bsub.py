@@ -74,7 +74,7 @@ for infile in glob(path.join(alignroot, "*/*.phy")):
     
     paml = codeml_cmd.format(infile, treefile, outroot, outfile, outdir)
     
-    p = Popen(['bsub', '-n 8','-R', 'rusage[tmp=512]', '-o'+logfile, 
+    p = Popen(['bsub','-R', 'rusage[tmp=512]', '-o'+logfile, 
                    paml])
         
     p.wait()

@@ -165,7 +165,7 @@ def format_alignment(fasta, tree, outdir):
 
         fasta_AA_alignment.close()
         phy_AA_out_file.close()
-
+           
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 args = argparser.parse_args()
 

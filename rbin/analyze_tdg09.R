@@ -3,7 +3,7 @@
 library(yaml)
 
 # read in the tdg09 output file # can be changed
-out <- yaml.load_file(input='/home/gideon/Documents/mphil_internship/tdg09_11_1_aa.txt')
+out <- yaml.load_file(input='/home/gideon/Documents/mphil_internship/tdg09_out/1/1_1.txt')
 
 # summary 
 summary(out)
@@ -75,4 +75,5 @@ for (p in 1:5) {
   points(which(fdr_vals <= 0.05), 1 - fdr_vals[fdr_vals <= 0.05], pch=20, col="#DE2D26")
 }
 
+# write((1 - fdr_vals), file="/home/gideon/Documents/mphil_internship/fdr_vals_1_1.txt", ncolumns = 1)
 

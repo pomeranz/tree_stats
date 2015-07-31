@@ -52,6 +52,9 @@ codeml_cmd = "python Scripts/analyse_codeml --alignfile {0} --treefile {1} --tem
 
 for infile in glob(path.join(alignroot, "*/*.phy")):
     print infile
+    
+    os.system("sed '1 s/$/ I/' {0} > {0}_tmp && mv {0}_tmp {0}".format(infile))
+    
     basename = path.basename(infile).partition('.')[0]
     basename = "".join(basename.split("_")[0] + "_" + basename.split("_")[1])
     prefix = basename.partition('_')[0][:2]

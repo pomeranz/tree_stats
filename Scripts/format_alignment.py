@@ -9,21 +9,24 @@ This script takes the output of PRANK and formats everything
 so that the alignment can be used for tdg09
 - Prefixes
 - Format conversion (fasta -> phylip-relaxed)
-
-Side note: It creates an intermediate directory with just the prefixes 
-changed. 
+- 4 alignments available
+    - fasta
+    - fasta AA
+    - phylip
+    - phylip AA
 
 Usage:
-python Scripts/format_align.py --fasta --tree --outdir --final_out
+python Scripts/format_align.py --fasta --tree --outdir
+
 
 To test:
 tree = "/home/gideon/Documents/mphil_internship/fas_pref_test/Eutheria/"
 fasta = "/home/gideon/Documents/mphil_internship/fas_pref_test2/"
-outdir = "/home/gideon/Documents/mphil_internship/fasta_prefix_out"
-final_out = "/home/gideon/Documents/mphil_internship/alignments2"
-toAA = True
-"""
+outdir = "/home/gideon/Documents/mphil_internship/alignments2"
 
+
+"""
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 import os
 from os import path
 from Bio import SeqIO
@@ -39,144 +42,139 @@ from itertools import izip_longest
 from Bio.Alphabet import IUPAC
 from Bio.SeqRecord import SeqRecord
 
+from utils import check_dir
+
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 def grouper(iterable, n, fillvalue=None):
     "Collect data into fixed-length chunks or blocks"
     # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx
     args = [iter(iterable)] * n
     return izip_longest(fillvalue=fillvalue, *args)
 
-
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 argparser = ArgumentParser()
 
 # commands for function
 argparser.add_argument("--fasta", metavar="Fasta files directory", type=str, required=True)
 argparser.add_argument("--tree", metavar="Tree files directory", type=str, required=True)
 argparser.add_argument("--outdir", metavar="Directory to write the new file to", type=str, required=True)
-argparser.add_argument("--final_out", metavar="Directory to write the new file to", type=str, required=True)
-argparser.add_argument("--translate", metavar="Translate DNA?", type=str, required=True)
+
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+def format_alignment(fasta, tree, outdir):
+    
+    treeroot = tree
+    fastaroot = path.join(fasta, "*/*prank.best.fas")
+    
+    check_dir(outdir)
 
 
-def fasta_prefix(fasta, tree, outdir, final_out, toAA):
-    
-    tree_dir = ''.join([tree + "*/*.nh"])
-    fasta_dir = ''.join([fasta + "*/*prank.best.fas"])
-    
-    if not os.path.exists(outdir):
-        os.makedirs(outdir)
-    
-    
-    tree_files = sorted(glob(tree_dir))
-    fasta_files = sorted(glob(fasta_dir))
-    
-    # make sure that both directories have the same amount of files
-    if len(tree_files) != len(fasta_files):
-        index = 0
-        while index <= len(tree_files)-1:
-            current_fasta = fasta_files[index]
-            current_fasta = current_fasta.split("/")
-            current_fasta = current_fasta[7]
-            current_fasta = current_fasta.split("_prank")
-            current_fasta = current_fasta[0]
-            
-            current_tree = tree_files[index]
-            current_tree = current_tree.split("/")
-            current_tree = current_tree[len(current_tree)-1]
-            current_tree = current_tree.split(".")
-            current_tree = current_tree[0]
-            if current_fasta != current_tree:
-                tree_files.remove(tree_files[index])
-                index = index - 1
-            print index
-            index += 1
-    
-    #tree_files = sorted(glob(tree_dir))
-    fasta_files = sorted(glob(fasta_dir))
-    
-    for file in range(len(fasta_files)):
+    for infile in glob(fastaroot):
         
         # print progress
-        print("".join("Finished " + str(file + 1) + " out of " + str(len(fasta_files))))        
+        print infile
         
-        current_fasta = fasta_files[file]
-        current_tree = tree_files[file]
+        basename = path.basename(infile).partition('.')[0]
+        basename = "".join(basename.split("_")[0] + "_" + basename.split("_")[1])
+        prefix = basename.partition('_')[0][:2]
         
-        out_sub_dir = "".join(outdir + "/" + current_fasta.split("/")[6])
+        fastafile = infile 
+        treedir = path.join(treeroot, prefix)
+        treefile = path.join(treedir, basename + '.nh')
         
-        if not os.path.exists(out_sub_dir):
-            os.makedirs(out_sub_dir)
+        # create the first 2 directories (fasta_out, fasta_AA_out)
         
-        out_file_temp = "".join(out_sub_dir + "/" + current_fasta.split("/")[7])
-        out_file = open(out_file_temp, "w+")
-                  
-        for ID in SeqIO.parse(current_fasta,"fasta", alphabet=IUPAC.unambiguous_dna):
+        fasta_out_dir = path.join(outdir, "fasta")
+        check_dir(fasta_out_dir)
+        fasta_AA_out_dir = path.join(outdir, "fasta_AA")
+        check_dir(fasta_AA_out_dir)
+        
+        fasta_out_subdir = path.join(fasta_out_dir, prefix)
+        check_dir(fasta_out_subdir)
+        fasta_out_file_path = path.join(fasta_out_subdir, "".join(basename + ".fa"))
+        fasta_AA_out_subdir = path.join(fasta_AA_out_dir, prefix)
+        check_dir(fasta_AA_out_subdir)
+        fasta_AA_out_file_path = path.join(fasta_AA_out_subdir, "".join(basename + ".fa"))
+        
+        fasta_out_file = open(fasta_out_file_path, "w")
+        fasta_AA_out_file = open(fasta_AA_out_file_path, "w")        
+
+          
+        for ID in SeqIO.parse(fastafile,"fasta", alphabet=IUPAC.unambiguous_dna):
             
-            tree_ids = Tree(newick=current_tree)
+            tree_ids = Tree(newick=treefile)
             for tree_id in tree_ids.iter_leaf_names():
                 
                 if tree_id.find(ID.id) != -1:
-                    print ID.id
+                    #print ID.id
                     ID.id = tree_id
                     #ID.name = ""
                     ID.description = ""
-                    print ID.id
-                    print ID
-                    if toAA == "False":                    
-                        SeqIO.write(ID, out_file, "fasta")
-                    else:
-                        aa_seq = []
-                        coding_dna = ID.seq
-                        #print coding_dna
-                        for codon in grouper(coding_dna, 3):
-                            cog = "".join(codon)
-                            if cog == "---":
-                                aa_seq.append("-")
-                            else:
-                                cog_aa = translate(cog)
-                                aa_seq.append(cog_aa)
-                        aa_seq = "".join(aa_seq)
-                        #print aa_seq
+                    #print ID.id
+                    #print ID
+                    
+                    # write the normal fasta out
+                    SeqIO.write(ID, fasta_out_file, "fasta")
+                    
+                    # translate cDNA and write AA fasta
+                    aa_seq = []
+                    coding_dna = ID.seq
+                    #print coding_dna
+                    for codon in grouper(coding_dna, 3):
+                        cog = "".join(codon)
+                        if cog == "---":
+                            aa_seq.append("-")
+                        else:
+                            cog_aa = translate(cog)
+                            aa_seq.append(cog_aa)
+                    aa_seq = "".join(aa_seq)
+
+                    ID = SeqRecord(Seq(aa_seq, IUPAC.protein), id = ID.id, name = ID.name)
+                    ID.description = ""
+
+                    SeqIO.write(ID, fasta_AA_out_file, "fasta")
+                    
+        fasta_out_file.close()
+        fasta_AA_out_file.close()
+        
+        phy_out_dir = path.join(outdir, "phylip")
+        check_dir(phy_out_dir)
+        phy_AA_out_dir = path.join(outdir, "phylip_AA")
+        check_dir(phy_AA_out_dir)
+        
+        phy_out_subdir = path.join(phy_out_dir, prefix)
+        check_dir(phy_out_subdir)
+        phy_out_file_path = path.join(phy_out_subdir, "".join(basename + ".fa"))
+        phy_AA_out_subdir = path.join(phy_AA_out_dir, prefix)
+        check_dir(phy_AA_out_subdir)
+        phy_AA_out_file_path = path.join(phy_AA_out_subdir, "".join(basename + ".fa"))
+
+        fasta_alignment = open(fasta_out_file_path, "rU")
+        fasta_AA_alignment = open(fasta_AA_out_file_path, "rU")
+        
+        phy_out_file = open(phy_out_file_path, "w")
+        phy_AA_out_file = open(phy_AA_out_file_path, "w")
                         
-                        #ID.seq = "".join(aa_seq + ", IUPACProtein()")
-                        ID = SeqRecord(Seq(aa_seq, IUPAC.protein), id = ID.id, name = ID.name)
-                        ID.description = ""
-                        print ID
-                        SeqIO.write(ID, out_file, "fasta")
-                        
-            
-                        
-            
-        #fas.close()
-        out_file.close()
+        alignments = AlignIO.parse(fasta_alignment, "fasta")
+        AlignIO.write(alignments, phy_out_file, "phylip-relaxed")
         
-        input_handle = open(out_file_temp, "rU")
-        out_sub_dir = "".join(final_out + "/" + current_fasta.split("/")[6])
-        
-        if not os.path.exists(out_sub_dir):
-            os.makedirs(out_sub_dir)
-        
-        
-        basename = path.basename(current_fasta).partition('.')[0]
-        basename = "".join(basename.split("_")[0] + "_" + basename.split("_")[1])
-        out_file = path.join(out_sub_dir, basename + ".phy")
-        
-        # out_file = "".join(out_sub_dir + "/" + current_fasta.split("/")[7])
-        output_handle = open(out_file, "w+")
-        
-        alignments = AlignIO.parse(input_handle, "fasta")
-        AlignIO.write(alignments, output_handle, "phylip-relaxed")
- 
-        output_handle.close()
-        input_handle.close()
-    
-        
+        fasta_alignment.close()
+        phy_out_file.close()
+
+        alignments_AA = AlignIO.parse(fasta_AA_alignment, "fasta")       
+        AlignIO.write(alignments_AA, phy_AA_out_file, "phylip-relaxed")
+
+        fasta_AA_alignment.close()
+        phy_AA_out_file.close()
+
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 args = argparser.parse_args()
 
 fasta = args.fasta
 tree = args.tree
 outdir = args.outdir
-final_out = args.final_out
-toAA = args.translate
 
-fasta_prefix(fasta, tree, outdir, final_out, toAA)
+
+format_alignment(fasta, tree, outdir)
 
 print("All done, the fasta file names should match the tree IDs")
+print("The alignments are available in fasta, fasta(AA), phylip, phylip(AA)")

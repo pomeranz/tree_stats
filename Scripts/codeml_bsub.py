@@ -50,7 +50,7 @@ if os.getcwd() != outroot:
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 # define the paml command
-codeml_cmd = "python Scripts/analyse_codeml --alignfile {0} --treefile {1} --template_dir {2} --outfile {3} --workdir {4}"
+codeml_cmd = "python /nfs/research2/goldman/pomeranz/tree_stats/Scripts/analyse_codeml --alignfile {0} --treefile {1} --template_dir {2} --outfile {3} --workdir {4}"
 # start the loop
 
 for infile in glob(path.join(alignroot, "*/*.phy")):

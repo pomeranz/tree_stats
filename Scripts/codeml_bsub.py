@@ -61,9 +61,11 @@ for infile in glob(path.join(alignroot, "*/*.phy")):
     
     logfile = path.join(logdir, basename + '.log')    
     
-    out_pre_dir = path.join(outroot, "out", prefix)
+    out_pre_dir = path.join(outroot, "out")
     check_dir(out_pre_dir)
-    outdir = path.join(out_pre_dir, basename)
+    out_sub_dir = path.join(out_pre_dir, prefix)
+    check_dir(out_pre_dir)
+    outdir = path.join(out_sub_dir, basename)
     check_dir(outdir)
     outfile = path.join(outdir, basename, ".mlc")
     # fixed_outfile = path.join(outdir, basename, ".fixed.mlc")

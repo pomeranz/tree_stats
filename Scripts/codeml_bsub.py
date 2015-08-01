@@ -34,9 +34,12 @@ outroot = args.outroot
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-# Create log directory
+# Create log directory and out directory
 
 check_dir(outroot)
+
+out_pre_dir = path.join(outroot, "out")
+check_dir(out_pre_dir)
 
 logdir = path.join(outroot, "logs")
 check_dir(logdir)
@@ -61,8 +64,6 @@ for infile in glob(path.join(alignroot, "*/*.phy")):
     
     logfile = path.join(logdir, basename + '.log')    
     
-    out_pre_dir = path.join(outroot, "out")
-    check_dir(out_pre_dir)
     out_sub_dir = path.join(out_pre_dir, prefix)
     check_dir(out_pre_dir)
     outdir = path.join(out_sub_dir, basename)

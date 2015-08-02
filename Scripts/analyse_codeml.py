@@ -35,6 +35,9 @@ def analyse_codeml(alignfile, treefile, template_dir, outfile, workdir):
     cml = codeml.Codeml()
     #fixed_cml = codeml.Codeml()
     
+    cml.read_ctl_file(path.join(template_dir, "template.ctl"))
+    #fixed_cml.read_ctl_file(path.join(template_dir, ".fixed.ctl"))
+    
     cml.alignment = alignfile
     #fixed_cml.alignment = alignfile
     cml.tree = treefile
@@ -44,9 +47,8 @@ def analyse_codeml(alignfile, treefile, template_dir, outfile, workdir):
     cml.working_dir = workdir 
     #fixed_cml.working_dir = workdir
     
-    
-    cml.read_ctl_file(path.join(template_dir, "template.ctl"))
-    #fixed_cml.read_ctl_file(path.join(template_dir, ".fixed.ctl"))
+    cml.ctl_file = "1_1.ctl"
+    cml.write_ctl_file()
     
     cml.run()
     #fixed_cml.run()

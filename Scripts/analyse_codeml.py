@@ -42,7 +42,7 @@ def analyse_codeml(alignfile, treefile, template_dir, outfile, workdir):
     #fixed_cml.alignment = alignfile
     cml.tree = treefile
     #fixed_cml.tree = treefile
-    cml.out_file = "".join(outfile + ".mlc")
+    cml.out_file = outfile
     #fixed_cml.out_file = "".join(outfile, ".fixed.mlc")
     cml.working_dir = workdir 
     #fixed_cml.working_dir = workdir

@@ -7,7 +7,7 @@ Created on Thu Jul 30 13:08:06 2015
 Description:
 This script uses Biopythons implementation of codeml.
 """
-
+import os
 from Bio.Phylo.PAML import codeml
 from os import path
 import argparse
@@ -35,6 +35,9 @@ def analyse_codeml(alignfile, treefile, template_dir, outfile, workdir):
     cml = codeml.Codeml()
     #fixed_cml = codeml.Codeml()
     
+    if os.getcwd() != template_dir:
+        os.chdir(template_dir)    
+    
     cml.read_ctl_file(path.join(template_dir, "template.ctl"))
     #fixed_cml.read_ctl_file(path.join(template_dir, ".fixed.ctl"))
     
@@ -46,6 +49,9 @@ def analyse_codeml(alignfile, treefile, template_dir, outfile, workdir):
     #fixed_cml.out_file = "".join(outfile, ".fixed.mlc")
     cml.working_dir = workdir 
     #fixed_cml.working_dir = workdir
+    
+    if os.getcwd() != workdir:
+        os.chdir(workdir)
     
     cml.ctl_file = "".join(outfile + ".ctl")
     cml.write_ctl_file()

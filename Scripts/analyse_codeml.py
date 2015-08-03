@@ -38,7 +38,7 @@ def analyse_codeml(alignfile, treefile, template_dir, outfile, workdir):
     if os.getcwd() != template_dir:
         os.chdir(template_dir)    
     
-    cml.read_ctl_file(path.join(template_dir, "template.ctl"))
+    cml.read_ctl_file("template.ctl")
     #fixed_cml.read_ctl_file(path.join(template_dir, ".fixed.ctl"))
     
     cml.alignment = alignfile

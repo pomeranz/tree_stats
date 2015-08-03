@@ -56,7 +56,9 @@ codeml_cmd = "python /nfs/research2/goldman/pomeranz/tree_stats/Scripts/analyse_
 for infile in glob(path.join(alignroot, "*/*.phy")):
     print infile
     
-    os.system("sed '1 s/$/ I/' {0} > {0}_tmp && mv {0}_tmp {0}".format(infile))
+    
+
+    os.system("sed '1 s/\([[:space:]]*[0-9]*\)\([[:space:]]*[0-9]*\)\([[:space:]]*I\)*/\1\2 I/g' {0} > {0}_tmp && mv {0}_tmp {0}".format(infile))
     
     basename = path.basename(infile).partition('.')[0]
     basename = "".join(basename.split("_")[0] + "_" + basename.split("_")[1])

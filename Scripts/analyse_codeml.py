@@ -47,7 +47,7 @@ def analyse_codeml(alignfile, treefile, template_dir, outfile, workdir):
     cml.working_dir = workdir 
     #fixed_cml.working_dir = workdir
     
-    cml.ctl_file = "1_1.ctl"
+    cml.ctl_file = "".join(outfile + ".ctl")
     cml.write_ctl_file()
     
     cml.run()

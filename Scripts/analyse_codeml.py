@@ -42,18 +42,23 @@ def analyse_codeml(alignfile, treefile, template_dir, outfile, workdir):
     #fixed_cml.read_ctl_file(path.join(template_dir, ".fixed.ctl"))
     
     cml.alignment = alignfile
+    print cml.alignment
     #fixed_cml.alignment = alignfile
     cml.tree = treefile
+    print cml.tree
     #fixed_cml.tree = treefile
     cml.out_file = outfile
+    print cml.out_file
     #fixed_cml.out_file = "".join(outfile, ".fixed.mlc")
-    cml.working_dir = workdir 
+    cml.working_dir = workdir
+    print cml.working_dir
     #fixed_cml.working_dir = workdir
     
     if os.getcwd() != workdir:
         os.chdir(workdir)
     
     cml.ctl_file = "".join(outfile + ".ctl")
+    print cml.ctl_file
     cml.write_ctl_file()
     
     cml.run()

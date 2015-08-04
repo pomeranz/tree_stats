@@ -38,7 +38,7 @@ check_dir(logroot)
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-slr_cmd = "/nfs/research2/goldman/pomeranz/tree_stats/Software/slr/bin/Slr_shared {0}"
+slr_cmd = "/nfs/research2/goldman/gregs/sw/slr-1.4.1/bin/Slr {0}"
 
 for infile in glob(path.join(ctlroot, "Eutheria", "*/*_matched.ctl")):
     print infile

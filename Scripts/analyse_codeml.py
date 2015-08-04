@@ -57,7 +57,9 @@ def analyse_codeml(alignfile, treefile, template_dir, outfile, workdir):
     if os.getcwd() != workdir:
         os.chdir(workdir)
     
-    cml.ctl_file = "".join(outfile + ".ctl")
+    ctlfile = outfile.split(".")[0]
+    
+    cml.ctl_file = "".join(ctlfile + ".ctl")
     print cml.ctl_file
     cml.write_ctl_file()
     

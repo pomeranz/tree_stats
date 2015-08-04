@@ -57,13 +57,13 @@ def analyse_codeml(alignfile, treefile, template_dir, outfile, workdir):
     if os.getcwd() != workdir:
         os.chdir(workdir)
     
-    ctlfile = outfile.split(".")[0]
+    ctlfile = "".join(outfile.split(".")[0] + ".ctl")
     
-    cml.ctl_file = "".join(ctlfile + ".ctl")
+    cml.ctl_file = ctlfile
     print cml.ctl_file
     cml.write_ctl_file()
     
-    cml.run()
+    cml.run(ctl_file=ctlfile, command = "/nfs/research2/goldman/pomeranz/tree_stats/Software/paml4.8/bin/codeml")
     #fixed_cml.run()
     
 

@@ -63,7 +63,7 @@ def analyse_codeml(alignfile, treefile, template_dir, outfile, workdir):
     print cml.ctl_file
     cml.write_ctl_file()
     
-    cml.run(ctl_file=ctlfile, command = "/nfs/research2/goldman/pomeranz/tree_stats/Software/paml4.8/bin/codeml")
+    cml.run(ctl_file=ctlfile, command = "/nfs/research2/goldman/botond/soft/bin/codeml")
     #fixed_cml.run()
     
 

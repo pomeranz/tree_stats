@@ -55,7 +55,6 @@ for infile in glob(path.join(ctlroot, "Eutheria", "*/*_matched.ctl")):
                '-cwd', path.dirname(infile), slr])
         
     p.wait()
-    python
     
         
     

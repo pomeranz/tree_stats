@@ -51,13 +51,11 @@ for infile in glob(path.join(ctlroot, "Eutheria", "*/*_matched.ctl")):
     
     slr = slr_cmd.format(infile)
     
-    if os.getcwd() != ctlroot:
-        os.chdir(ctlroot)
-    
-    p = Popen(['bsub','-R', 'rusage[tmp=512]', '-o'+logfile, 
-                   slr])
+    p = Popen(['bsub','-R', 'rusage[tmp=512]', '-o'+logfile, '-g', '/slr',
+               '-cwd', path.dirname(infile), slr])
         
     p.wait()
+    python
     
         
     

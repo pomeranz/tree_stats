@@ -18,10 +18,13 @@ outroot = "/home/gideon/Documents/mphil_internship/format_tree_out"
 
 """
 import os
+from os import path
 from glob import glob
 from ete2 import Tree
 from Bio import SeqIO
 from argparse import ArgumentParser
+from utils import check_dir
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 argparser = ArgumentParser()
 
@@ -29,32 +32,41 @@ argparser.add_argument("--treeroot", metavar="Tree Directory", type=str, require
 argparser.add_argument("--fastaroot", metavar="Fasta Directory", type=str, required=True)
 argparser.add_argument("--outroot", metavar="Output Directory", type=str, required=True)
 
-
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 def format_trees(treeroot, fastaroot, outroot):
     
-    tree_dir = ''.join([treeroot + "*/*.nh"])
-    fasta_dir = ''.join([fastaroot + "*/*.fa"])
+    fastafiles = path.join(fastaroot, "*/*.fa")
     
     if not os.path.exists(outroot):
         os.makedirs(outroot)
     
-    tree_files = sorted(glob(tree_dir))
-    fasta_files = sorted(glob(fasta_dir))
-     
+    rooted_out_dir = path.join(outroot, "rooted")
+    check_dir(rooted_out_dir)
+    unrooted_out_dir = path.join(outroot, "unrooted")
+    check_dir(unrooted_out_dir)
     
-    for index in range(len(fasta_files)):
-        current_fasta = fasta_files[index]
-        current_tree = tree_files[index]
+    
+    for infile in glob(fastafiles):
         
-        # this is wrong! need to only remove the tree leaves
-        # which are not in the fasta file  
-        tree = Tree(newick=current_tree)
+        print infile
         
+        basename = path.basename(infile).partition('.')[0]
+        basename = "".join(basename.split("_")[0] + "_" + basename.split("_")[1])
+        prefix = basename.partition('_')[0][:2]
+        
+        fastafile = infile 
+        treedir = path.join(treeroot, prefix)
+        treefile = path.join(treedir, basename + '.nh')
+        
+        # make the tree object
+        tree = Tree(newick=treefile)
+        
+        # loop that deletes nodes that are not in the alignment
         for leaf_name in tree.iter_leaf_names():
             
             name_check = []
             
-            for ID in SeqIO.parse(current_fasta, "fasta"):
+            for ID in SeqIO.parse(fastafile, "fasta"):
                 if ID.id in leaf_name:
                     name_check.append(True)
                 else:
@@ -68,18 +80,25 @@ def format_trees(treeroot, fastaroot, outroot):
                 #node = leaf.up
                 #node.remove_child(leaf)
                     
-            
-            out_sub_dir = "".join(outroot + "/" + current_tree.split("/")[7])
-            out_file = "".join(out_sub_dir + "/" + current_tree.split("/")[8])
-            
-            if not os.path.exists(out_sub_dir):
-                os.makedirs(out_sub_dir)
+            # create the directories for rooted trees
+            rooted_out_sub_dir = path.join(rooted_out_dir, prefix)
+            check_dir(rooted_out_sub_dir)
+            rooted_out_file = path.join(rooted_out_sub_dir, basename + ".nh")
             
             
-            tree.write(outfile=out_file, format=6)
-        print("".join("Finished " + str(index + 1) + " out of " + str(len(fasta_files))))        
             
-
+            tree.write(outfile=rooted_out_file, format=6)
+            
+            # create subdirectories for unrooted trees
+            unrooted_out_sub_dir = path.join(unrooted_out_dir, prefix)
+            check_dir(unrooted_out_sub_dir)
+            unrooted_out_file = path.join(unrooted_out_sub_dir, basename + ".nh")
+            # unroot the tree
+            tree.unroot()
+            
+            tree.write(outfile=unrooted_out_file, format=6)
+            
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # call the function
 args = argparser.parse_args()
 
@@ -89,4 +108,4 @@ outroot = args.outroot
 
 format_trees(treeroot, fastaroot, outroot)
 
-print("All done, the trees should be formatted now")
+print("All done, the trees should be formatted now. 2 directories: rooted and unrooted created!")

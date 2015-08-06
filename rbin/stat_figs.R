@@ -6,10 +6,10 @@ library(ggplot2)
 #-----------------------------------------------------#
 
 # set wd
-setwd("~/Documents/mphil_internship")
+setwd("~/Documents/mphil_internship/trees")
 
 # read in the stats file
-tree_stats <- read.csv(file = "tree_stats_try4.csv", header = TRUE)
+tree_stats <- read.csv(file = "tree_stats_output.csv", header = TRUE)
 
 colnames(tree_stats)
 
@@ -36,7 +36,7 @@ no_paralogs <- unlist(no_paralogs[1])
 
 ## Tree Length ##
 
-plot(Length, type="l", main="Tree Lengths", xlab="Tree #")
+plot(Length,type="l", main="Tree Lengths", xlab="Tree #")
 
 ## Biggest Branch ##
 

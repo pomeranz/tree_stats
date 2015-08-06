@@ -50,7 +50,8 @@ full_results <- as.data.frame(full_results)
 # recalculate same things for this table too
 deltaLnL_vals = apply(full_results, 1, FUN=function(x) abs(x[6]))
 full_results$deltaLnL = deltaLnL_vals
-lrt_vals = apply(full_results, 1, FUN=function(x) pchisq(2*x[6], df=x[7], lower.tail=FALSE))
+#lrt_vals = apply(full_results, 1, FUN=function(x) pchisq(2*x[6], df=x[7], lower.tail=FALSE))
+lrt_vals = apply(full_results, 1, FUN=function(x) pchisq(2*x[6], df=19, lower.tail=FALSE))
 full_results$lrt = lrt_vals
 #fdr_vals = apply(full_results, 1, FUN=function(x) p.adjust(full_results[,8], method="fdr"))
 fdr_vals = p.adjust(full_results[,8], method="fdr")
@@ -75,5 +76,5 @@ for (p in 1:5) {
   points(which(fdr_vals <= 0.05), 1 - fdr_vals[fdr_vals <= 0.05], pch=20, col="#DE2D26")
 }
 
-# write((1 - fdr_vals), file="/home/gideon/Documents/mphil_internship/fdr_vals_1_1.txt", ncolumns = 1)
+#write((1 - fdr_vals), file="/home/gideon/Documents/mphil_internship/fdr_vals_1_1.txt", ncolumns = 1)
 

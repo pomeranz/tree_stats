@@ -76,12 +76,13 @@ for infile in glob(path.join(alignroot, "*/*.phy")):
     treedir = path.join(treeroot, prefix)
     treefile = path.join(treedir, basename + '.nh')
     
-    template_file = "template.ctl"
+    # template_file = "template.ctl"
+    template_dir = outroot
     
     if os.getcwd() != outdir:
         os.chdir(outdir)
     
-    paml = codeml_cmd.format(infile, treefile, template_file, outfile, outdir)
+    paml = codeml_cmd.format(infile, treefile, template_dir, outfile, outdir)
     
     p = Popen(['bsub','-R', 'rusage[tmp=512]', '-o'+logfile, '-g', '/codeml', 
                    paml])

@@ -2,14 +2,15 @@
 
 ## PACKAGES ##
 library(ggplot2)
+require(grid)
 
 #-----------------------------------------------------#
 
 # set wd
-setwd("~/Documents/mphil_internship/trees")
+setwd("~/Documents/mphil_internship/split_tree_out/unprefixed")
 
 # read in the stats file
-tree_stats <- read.csv(file = "tree_stats_output.csv", header = TRUE)
+tree_stats <- read.csv(file = "split_tree_stats.csv", header = TRUE)
 
 colnames(tree_stats)
 
@@ -20,48 +21,30 @@ to_remove <- c(1, 5, 7)
 tree_numbs <- tree_stats[-to_remove]
 
 attach(tree_numbs)
+# Histogram for Length
+length <- qplot(Length, xlim=c(0,300))
+length + geom_histogram(aes(fill = ..count..))
 
-no_paralogs <- tree_numbs[8]
-no_paralogs <- unlist(no_paralogs[1])
+tail.length <- qplot(X..of.Leaves, xlim=c(300,500), xlab="", ylab = "")
+tail.length <- tail.length + geom_histogram(aes(fill = ..count..))
+print(tail.length, vp=viewport(width = 0.3, height = 0.3, x = 0.85, y = 0.2, just = c("right", "bottom")))
 
+# Histogram for Number of Leaves
+no.leaves <- qplot(X..of.Leaves, data=tree_numbs, xlim=c(0,300), xlab = "Number of leaves")
+no.leaves + geom_histogram(aes(fill= ..count..), binwidth=10)
 
-# most of the plots are very skewed, need to think of a better way of displaying them. 
+tail.leaves <- qplot(X..of.Leaves, xlim=c(300,500), xlab="", ylab = "")
+tail.leaves <- tail.leaves + geom_histogram(aes(fill = ..count..))
 
-# log?
-#multiple axis?
-# SCALE BREAK, good when we only have a few big numbers. I think that would be best when we display all data at once + multiple axis
+print(tail.leaves, vp=viewport(width = 0.3, height = 0.3, x = 0.85, y = 0.2, just = c("right", "bottom")))
 
+# Decided to take this as an example when stuff goes wrong. Have to remove trees where less than 48 leaves. 
 
-## PLOTS ##
+# table that holds the means of all the stats
 
-## Tree Length ##
+stats_summary <- matrix(ncol=9) 
+colnames(stats_summary) <-  c("Length", "Biggest.Branch", "Smallest.Branch", "Farthest.Leaf", "Closest.Leaf", "No.of.Leaves", "No.of.Species", "No.of.Paralogs","No.of.Human.seqs")
 
-plot(Length,type="l", main="Tree Lengths", xlab="Tree #")
-
-## Biggest Branch ##
-
-# maybe x-axis break
-hist(Biggest.Branch)
-
-## Smallest Branch ##
-hist(Smallest.Branch)
-
-## Distance of farthest leaf ##
-plot(Distance.of.farthest.leaf)
-
-## Distance of closest leaf ##
-plot(Distance.of.closest.leaf)
-
-## Number of leaves ##
-boxplot(X..of.Leaves)
-
-## Number of Species ##
-boxplot(X..of.Species)
-
-## Number of Paralogs ##
-boxplot(X..of.Paralogs)
-hist(log(no_paralogs))
-
-## Number of human seqs ##
-boxplot(X..of.Human.seqs)
-
+for (i in 1:length(colnames(tree_numbs))) {
+  stats_summary[1,i] <- round(mean(tree_numbs[,i]))
+}

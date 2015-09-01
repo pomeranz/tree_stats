@@ -1,3 +1,14 @@
+# General
+This package has a number of scripts designed to perform a comparative analysis between methods to detect positive selection. These include:
+
+- TDG09
+- PAML (codeml)
+- SLR
+- HYPHY (in progress)
+
+Each methods has 2 scripts. One that analyses the data and one that submits the jobs to a cluster. The latter can be customized to fit the requirements of ones cluster. 
+Finally, there are some additional scripts such as tree_stats which are outlined below:
+
 # tree_stats
 A script that takes a number of tree directories and outputs tree statistics
 

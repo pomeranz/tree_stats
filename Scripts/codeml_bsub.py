@@ -65,6 +65,17 @@ for infile in glob(path.join(alignroot, "*/*.phy")):
     basename = "".join(basename.split("_")[0] + "_" + basename.split("_")[1])
     prefix = basename.partition('_')[0][:2]
     
+    # extra statement that only run when the output file does not exist already
+    already_out = path.join("/nfs/research2/goldman/pomeranz/tree_stats/paml_out/out/",prefix, basename, "rst")    
+    
+    # make it so it tests wether the file is complete based on the R stuff you did    
+    
+    if os.path.isfile(already_out):
+        if '(BEB)' in open(already_out).read() and 'Positively' in open(already_out).read():
+            continue
+        else:
+            pass
+
     logfile = path.join(logdir, basename + '.log')    
     
     out_sub_dir = path.join(out_pre_dir, prefix)

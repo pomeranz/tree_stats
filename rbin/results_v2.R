@@ -156,6 +156,43 @@ paml_results <- function(infile) {
   # function end  
 }
 
+
+######################################### RESULTS FUNCTION #########################################################
+
+site_table_rows <- function(file, method, sites, site_table) {
+  
+  # create basenames to acces the other files.
+  basename = head(unlist(strsplit(tail(unlist(strsplit(infile, split="/")), n=1), split=".", fixed=TRUE)), n=1)
+  basename = paste(unlist(strsplit(basename, split="_"))[1], unlist(strsplit(basename, split="_"))[2], sep="_")
+  prefix = substr(unlist(strsplit(basename, split="_", fixed=TRUE))[1], 1, 2)
+  
+  if (method == "TDG09") {
+    file <- paste("/tdg09_out/", prefix, "/", basename, ".txt", sep="")
+  } else if (method == "SLR") {
+    file <- paste("/slr_out/Eutheria/",prefix, "/", basename, "_matched.res", sep="")
+  } else if (method == "PAML") {
+    file <- paste("/paml_out/out/",prefix, "/", basename, "/", "rst", sep="")
+  }
+  
+  if (sites > 1) {
+    index = 1
+    for (site in sites) {
+      
+      # need a way to create multiple vectors with different names, kinda like .format in python
+      
+      index = index + 1
+    }
+  } else {
+    add <- c(file,method,site)
+    site_table <- rbind(site_table, add)
+  }
+  
+  
+}
+
+
+
+
 ######################################### FISHER TEST AND INTERSECT FUNCTIONS ##########################################
 
 count_total_sites <- function(results1,results2, total_sites) {
@@ -395,3 +432,8 @@ methods_fishers(results_table, 6, toal_slr, total_paml, total_sites_slr_paml)
 ######################################### Intersect shenanigans ########################################## 
 names(exact_intersect) <- intersect_names
 exact_intersect
+
+######################################### Inspect results ########################################## 
+
+# results_table
+# site_table

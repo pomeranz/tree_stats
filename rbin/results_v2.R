@@ -67,7 +67,7 @@ slr_results <- function(infile) {
   
   if (file.exists(infile) == FALSE) {
     run = FALSE
-    return(list("No data available", run))
+    return(list("No data available", run, 0))
   }
   
   cn <- c("Neutral", "Optimal", "omega", "lower", "upper", "LRT_Stat", "Pval", "Adj.Pval", "Q-value", "Result", "Note")
@@ -105,13 +105,13 @@ paml_results <- function(infile) {
   # Error 1 - Didn't run --> no file
   if (file.exists(infile) == FALSE) {
     run = FALSE
-    return(list("Error: No outfile", run))
+    return(list("Error: No outfile", run, 0))
   }
   
   # Error 2 - Didn't start --> less than 50 lines
   if (length(readLines(infile)) < 50) {
     run = FALSE
-    return(list("Error: no output", run))
+    return(list("Error: no output", run, 0))
   }
   
   file <- readLines(paml_file)

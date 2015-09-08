@@ -205,8 +205,7 @@ site_intersects <- function(method1_sites, method2_sites, results_table, index, 
   
   # Intersects
   if (length(method1_sites) >= 1 & length(method2_sites) >= 1) {
-    get_exact <- TRUE
-    intersected_sites <- intersect(method1_sites, method2_sites)
+    
     no_intersected_sites <- length(intersect(method1_sites, method2_sites))
     if (length(no_intersected_sites) == 0) {
       results_table[index,column] <- 0
@@ -215,11 +214,10 @@ site_intersects <- function(method1_sites, method2_sites, results_table, index, 
       #results_table[index,7] <- tdg_slr_sites
     }
   } else {
-    get_exact <- FALSE
-    results_table[index,column] <- "Uneven"
+    results_table[index,column] <- "No intersects"
   }
   
-  return(list(results_table,get_exact))
+  return(results_table)
   
 }
 
@@ -369,15 +367,15 @@ for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
   
   # TDG - SLR 
   total_sites_tdg_slr <- count_total_sites(tdg_res_plus, slr_res_plus, total_sites_tdg_slr)
-  tdg_slr_intersects <- site_intersects(tdg_site_names, slr_site_names, results_table, index, 6)
+  results_table <- site_intersects(tdg_site_names, slr_site_names, results_table, index, 6)
 
   # TDG - PAML
   total_sites_tdg_paml <- count_total_sites(tdg_res_plus, paml_res_plus, total_sites_tdg_paml)
-  tdg_paml_intersects <- site_intersects(tdg_site_names, paml_site_names, results_table, index, 5)
+  results_table <- site_intersects(tdg_site_names, paml_site_names, results_table, index, 5)
 
   # SLR - PAML
   total_sites_slr_paml <- count_total_sites(slr_res_plus, paml_res_plus, total_sites_slr_paml)
-  slr_paml_intersects <- site_intersects(slr_site_names, paml_site_names, results_table, index, 7)
+  results_table <- site_intersects(slr_site_names, paml_site_names, results_table, index, 7)
   
   
 #   # Intersects
@@ -427,17 +425,22 @@ for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
 methods_fishers(results_table, 6, total_tdg, total_slr, sum(total_sites_tdg_slr))
 
 ## TDG-PAML ##
-methods_fishers(results_table, 6, total_tdg, total_paml, sum(total_sites_tdg_paml))
+methods_fishers(results_table, 5, total_tdg, total_paml, sum(total_sites_tdg_paml))
 
 ## SLR-PAML ##
-methods_fishers(results_table, 6, total_slr, total_paml, sum(total_sites_slr_paml))
+methods_fishers(results_table, 7, total_slr, total_paml, sum(total_sites_slr_paml))
   
 ######################################### Intersect shenanigans ########################################## 
-names(exact_intersect) <- intersect_names
-exact_intersect
+#names(exact_intersect) <- intersect_names
+#exact_intersect
 
 ######################################### Inspect results ########################################## 
 
 # results_table
+# I'm sure there is a better way for this!
 site_table <- site_table[-1,]
 #site_table
+
+######################################### Write to file ##########################################
+
+

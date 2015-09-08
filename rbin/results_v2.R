@@ -174,24 +174,15 @@ site_table_rows <- function(file, method, sites, site_table) {
     file <- paste("/paml_out/out/",prefix, "/", basename, "/", "rst", sep="")
   }
   
-  if (sites > 1) {
-    index = 1
+  if (length(sites) >= 1) {
     for (site in sites) {
-      
-      # need a way to create multiple vectors with different names, kinda like .format in python
-      
-      index = index + 1
+      add <- c(file,method,site)
+      site_table <- rbind(site_table, add)
     }
-  } else {
-    add <- c(file,method,site)
-    site_table <- rbind(site_table, add)
   }
   
-  
+  return(site_table)
 }
-
-
-
 
 ######################################### FISHER TEST AND INTERSECT FUNCTIONS ##########################################
 
@@ -208,6 +199,7 @@ count_total_sites <- function(results1,results2, total_sites) {
   return(total_sites)
 }
 
+# I don't think this is working
 site_intersects <- function(method1_sites, method2_sites, results_table, index, column) {
   # calculates the intersect bwtween two methods and adds it to the results_table
   
@@ -226,6 +218,8 @@ site_intersects <- function(method1_sites, method2_sites, results_table, index, 
     get_exact <- FALSE
     results_table[index,column] <- "Uneven"
   }
+  
+  return(list(results_table,get_exact))
   
 }
 
@@ -302,7 +296,9 @@ for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
       total_tdg <- c(total_tdg, tdg_sites)
     }
   }
-
+  
+  # add to site_table
+  site_table <- site_table_rows(infile, "TDG09", tdg_site_names, site_table)
   
   ### SLR ###
   slr_file <- paste("/home/gideon/Documents/mphil_internship/slr_out/Eutheria/",prefix, "/", basename, "_matched.res", sep="")
@@ -328,6 +324,9 @@ for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
       total_slr <- c(total_slr, slr_sites)
     } 
   }
+  
+  # add to site_table
+  site_table <- site_table_rows(infile, "SLR", slr_site_names, site_table)
   
   ### PAML ###
   paml_file <- paste("/home/gideon/Documents/mphil_internship/paml_out/out/",prefix, "/", basename, "/", "rst", sep="")
@@ -355,6 +354,9 @@ for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
     }
   }
   
+  # add to site_table
+  site_table <- site_table_rows(infile, "PAML", paml_site_names, site_table)
+  
   ###### FISHER TESTS AND INTERSECTS #######
   # count number of sites in total and number of sites found in each method
 #   if (slr_res_plus[[2]] == FALSE) {
@@ -371,11 +373,11 @@ for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
 
   # TDG - PAML
   total_sites_tdg_paml <- count_total_sites(tdg_res_plus, paml_res_plus, total_sites_tdg_paml)
-  tdg_paml_intersects <- site_intersects(tdg_site_names, paml_res_plus, results_table, index, 5)
+  tdg_paml_intersects <- site_intersects(tdg_site_names, paml_site_names, results_table, index, 5)
 
   # SLR - PAML
   total_sites_slr_paml <- count_total_sites(slr_res_plus, paml_res_plus, total_sites_slr_paml)
-  slr_paml_intersects <- site_intersects(slr_site_names, paml_res_plus, results_table, index, 7)
+  slr_paml_intersects <- site_intersects(slr_site_names, paml_site_names, results_table, index, 7)
   
   
 #   # Intersects
@@ -393,20 +395,21 @@ for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
 #     get_exact <- FALSE
 #     results_table[index,6] <- "Uneven"
 #   }
+
   
   # get a list with the exact position of the intersected sites
-  if (get_exact == TRUE) {
-    if (length(tdg_slr_sites) > 1) {
-      intersect_names <- c(intersect_names, basename) # not tested yet
-      exact_intersect <- c(exact_intersect, list(tdg_slr_sites))
-    } else {
-      exact_intersect <- c(exact_intersect, tdg_slr_sites)
-    }
-    
-  }
+#   if (get_exact == TRUE) {
+#     if (length(tdg_slr_sites) > 1) {
+#       intersect_names <- c(intersect_names, basename) # not tested yet
+#       exact_intersect <- c(exact_intersect, list(tdg_slr_sites))
+#     } else {
+#       exact_intersect <- c(exact_intersect, tdg_slr_sites)
+#     }
+#     
+#   }
   
   
-  get_exact <- FALSE
+  #get_exact <- FALSE
   
   # progress index
   index = index + 1
@@ -421,13 +424,13 @@ for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
 # fisher.test(m, alternative="greater") 
 
 ## TDG-SLR ##
-methods_fishers(results_table, 6, toal_tdg, total_slr, total_sites_tdg_slr)
+methods_fishers(results_table, 6, total_tdg, total_slr, sum(total_sites_tdg_slr))
 
 ## TDG-PAML ##
-methods_fishers(results_table, 6, toal_tdg, total_paml, total_sites_tdg_paml)
+methods_fishers(results_table, 6, total_tdg, total_paml, sum(total_sites_tdg_paml))
 
 ## SLR-PAML ##
-methods_fishers(results_table, 6, toal_slr, total_paml, total_sites_slr_paml)
+methods_fishers(results_table, 6, total_slr, total_paml, sum(total_sites_slr_paml))
   
 ######################################### Intersect shenanigans ########################################## 
 names(exact_intersect) <- intersect_names
@@ -436,4 +439,5 @@ exact_intersect
 ######################################### Inspect results ########################################## 
 
 # results_table
-# site_table
+site_table <- site_table[-1,]
+#site_table

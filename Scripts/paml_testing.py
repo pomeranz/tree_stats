@@ -59,7 +59,7 @@ for infile in glob(path.join(alignroot, "*/*.phy")):
     
     
                     #### OLD PAML RUN ###
-    old_human_time = time.localtime()    
+    old_human_time_start = time.localtime()    
     
     old_start_time = time.time()    
     
@@ -86,19 +86,20 @@ for infile in glob(path.join(alignroot, "*/*.phy")):
     old_cml.run(ctl_file=old_ctlfile, command = "/nfs/research2/goldman/botond/soft/bin/codeml", verbose=True)
     
     old_end_time = time.time()
-    old_human_time = time.localtime()
+    old_human_time_end = time.localtime()
     # runtime in seconds
     old_runtime = old_end_time - old_start_time
     
     # write time to a file
     
-    
+    old_times = open(path.join(old_outdir,"times.txt"), "w")
+    old_times.write(old_human_time_start, old_human_time_end, old_start_time, old_end_time, old_runtime)
     
     
 
                     #### NEW PAML RUN ###
     
-    new_human_time = time.localtime()    
+    new_human_time_start = time.localtime()    
     
     new_start_time = time.time()
 
@@ -124,11 +125,12 @@ for infile in glob(path.join(alignroot, "*/*.phy")):
     new_cml.run(ctl_file=new_ctlfile, command = "/nfs/research2/goldman/gregs/sw/paml4.8/bin/codeml", verbose=True)
     
     new_end_time = time.time()
-    new_human_time - time.localtime()
+    new_human_time_end = time.localtime()
     # time in seconds
     new_runtime = new_end_time - new_start_time
     
-    # write time to a file
-    
+    # write time to a file # finish this
+    new_times = open(path.join(new_outdir,"times.txt"), "w")
+    new_times.write(new_human_time_start, new_human_time_end, new_start_time, new_end_time, new_runtime)
     
     

@@ -250,7 +250,7 @@ methods_fishers <- function(results_table,column,total_method1,total_method2, to
 
 ### Preparation ###
 results_table <- data.frame(matrix(ncol=8))
-colnames(results_table) <- c("Alignfile", "Alignment_Length", "TDG09_sites", "PAML_sites", "SLR_sites", "TDG09-PAML", "TDG09-SLR", "SLR-PAML")
+colnames(results_table) <- c("Alignfile", "Alignment_Length", "TDG09_sites", "PAML_sites", "SLR_sites", "TDG09_PAML", "TDG09_SLR", "SLR_PAML")
 site_table <- data.frame(matrix(ncol=3))
 colnames(site_table) <- c("file", "method", "site")
 
@@ -476,7 +476,7 @@ fisher_slr_paml <- methods_fishers(results_table[paml_idx, ], 8, total_slr[paml_
 #names(exact_intersect) <- intersect_names
 #exact_intersect
 
-######################################### Inspect results ########################################## 
+######################################### Fix results ########################################## 
 
 # results_table
 # I'm sure there is a better way for this!
@@ -484,6 +484,21 @@ site_table <- site_table[-1,]
 #site_table
 
 colnames(paml_lnL_table) <- c("infile", "Model_7", "Model_8", "deltalnL", "p_val")
+
+######################################### Inscpect results ########################################## 
+
+# comparing SLR to PAML
+# only take hits where PAML was singificant
+comp_slr_paml <- results_table[which(paml_lnL_table$p_val <= 0.05),]
+
+# now find the files where they intersected
+comp_slr_paml[which(comp_slr_paml$SLR_PAML != "No intersects"),]
+
+
+which(results_table[which(paml_lnL_table$p_val <= 0.05),]$SLR_PAML != "No intersects" )
+
+
+
 
 ######################################### Write to file ##########################################
 
@@ -500,10 +515,7 @@ fisher_tdg_paml
 fisher_slr_paml
 sink()
 
-
-#write(fisher_tdg_paml, file="fisher_tests.txt")
-#write(fisher_tdg_slr, file="fisher_tests.txt", append = TRUE)
-#write(fisher_slr_paml, file="fisher_tests.txt", append = TRUE)
+#write.csv(paml_lnL_table, file="paml_lnL_table.csv")
 
 #results_yaml <- as.yaml(list(site_table,full_results,list(fisher_tdg_slr,fisher_tdg_paml,fisher_slr_paml)), column.major = FALSE)
 #write(results_yaml, file="results_yaml")

@@ -114,7 +114,7 @@ paml_results <- function(infile) {
     return(list("Error: no output", run, 0))
   }
   
-  file <- readLines(paml_file)
+  file <- readLines(infile)
   
   # Error 3 - unfinished output --> job was killed half way through
   if (!("(BEB)" %in% unlist(str_split(file, pattern= " ")))) {
@@ -139,7 +139,7 @@ paml_results <- function(infile) {
       break
     } else {
       site <- as.numeric(substr(i, 1,7))
-      prob <- as.numeric(substr(i, 14,22))
+      prob <- as.numeric(substr(i, 14,19))
       omega <- substr(i,29,43)
       df[index,] <- c(site,prob,omega)
       index = index + 1
@@ -152,7 +152,17 @@ paml_results <- function(infile) {
   
   run = TRUE
   
-  return(list(df, run, nrow(df)))
+  # get the likelihoods to calculate wether it is even worth looking at the alignment
+  
+  lnLs <- grep("lnL", file)
+  model_eight <- lnLs[2]
+  model_seven <- lnLs[1]
+  deltalnL <- as.numeric(substr(file[model_eight], 6, 20)) - as.numeric(substr(file[model_seven], 6, 20))
+  p_val <- pchisq(2*deltalnL, df=2, lower.tail=FALSE)
+  lnL_info <- c(infile, as.numeric(substr(file[model_seven], 6, 20)), as.numeric(substr(file[model_eight], 6, 20)), deltalnL, p_val)
+  
+  
+  return(list(df, run, nrow(df), lnL_info))
   # function end  
 }
 
@@ -194,6 +204,8 @@ count_total_sites <- function(results1,results2, total_sites) {
     total_sites <- c(total_sites, results2[[3]])
   } else if (results2[[2]] == FALSE & results1[[2]] == FALSE) {
     total_sites <- c(total_sites, 0)
+  } else {
+    total_sites <- c(total_sites, 0)
   }
   
   return(total_sites)
@@ -221,14 +233,15 @@ site_intersects <- function(method1_sites, method2_sites, results_table, index, 
   
 }
 
-methods_fishers <- function(results_table,column,toal_method1,total_method2, total_sites) {
+methods_fishers <- function(results_table,column,total_method1,total_method2, total_sites, title) {
   
   # how many times overlapped
-  total_intersect <- length(which(results_table[,column] != "Uneven" & results_table[,column] != 0))
+  total_intersect <- length(which(results_table[,column] != "No intersects" & results_table[,column] != 0))
   
-  m <- matrix(c(total_intersect, sum(total_method2)-total_intersect, sum(toal_method1)-total_intersect, sum(total_sites)-(sum(total_method2)+sum(toal_method1))+total_intersect), nrow=2)
+  m <- matrix(c(total_intersect, sum(total_method2)-total_intersect, sum(total_method1)-total_intersect, sum(total_sites)-(sum(total_method2)+sum(total_method1))+total_intersect), nrow=2)
+  print(m)
   x <- fisher.test(m, alternative="greater")
-  
+  x$data.name <- title
   return(x)
 }
 
@@ -236,10 +249,13 @@ methods_fishers <- function(results_table,column,toal_method1,total_method2, tot
 ######################################### RESULTS ##########################################
 
 ### Preparation ###
-results_table <- data.frame(matrix(ncol=7))
-colnames(results_table) <- c("Alignfile", "TDG09_sites", "PAML_sites", "SLR_sites", "TDG09-PAML", "TDG09-SLR", "SLR-PAML")
+results_table <- data.frame(matrix(ncol=8))
+colnames(results_table) <- c("Alignfile", "Alignment_Length", "TDG09_sites", "PAML_sites", "SLR_sites", "TDG09-PAML", "TDG09-SLR", "SLR-PAML")
 site_table <- data.frame(matrix(ncol=3))
 colnames(site_table) <- c("file", "method", "site")
+
+# PAML table
+paml_lnL_table <- data.frame(matrix(ncol=5))
 
 setwd("/home/gideon/Documents/mphil_internship/")
 inroot = getwd()
@@ -263,6 +279,10 @@ for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
   
   print(infile)
   
+  # get alignment length
+  aln_length <- as.integer(summary(read.FASTA(infile))[,1][1])
+  results_table[index,2] <- aln_length
+  
   # create basenames to acces the other files.
   basename = head(unlist(strsplit(tail(unlist(strsplit(infile, split="/")), n=1), split=".", fixed=TRUE)), n=1)
   basename = paste(unlist(strsplit(basename, split="_"))[1], unlist(strsplit(basename, split="_"))[2], sep="_")
@@ -279,17 +299,17 @@ for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
   tdg_sites <- nrow(tdg_res)
   
   if (tdg_res_plus[[2]] == FALSE) {
-    results_table[index,2] <- "Missing output"
+    results_table[index,3] <- "Missing output"
     tdg_site_names <- c()
     total_tdg <- c(total_tdg, 0)
   } else {
     if (tdg_sites == 0) {
-      results_table[index,2] <- tdg_sites
+      results_table[index,3] <- tdg_sites
       tdg_site_names <- c()
       total_tdg <- c(total_tdg, 0)
     } else {
       tdg_sites <- nrow(tdg_res)
-      results_table[index,2] <- tdg_sites
+      results_table[index,3] <- tdg_sites
       tdg_site_names <- tdg_res[,1]
       total_tdg <- c(total_tdg, tdg_sites)
     }
@@ -303,7 +323,7 @@ for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
   
   slr_res_plus <- slr_results(slr_file)
   if (slr_res_plus[[2]] == FALSE) {
-    results_table[index,4] <- "Missing output"
+    results_table[index,5] <- "Missing output"
     slr_sites <- 0
     slr_site_names <- c()
     total_slr <- c(total_slr, slr_sites)
@@ -312,12 +332,12 @@ for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
     
     if (nrow(slr_res) >= 1) {
       slr_sites <- nrow(slr_res)
-      results_table[index,4] <- slr_sites
+      results_table[index,5] <- slr_sites
       slr_site_names <- c(as.integer(rownames(slr_res)))
       total_slr <- c(total_slr, slr_sites)
     } else {
       slr_sites <- nrow(slr_res)
-      results_table[index,4] <- slr_sites
+      results_table[index,5] <- slr_sites
       slr_site_names <- c()
       total_slr <- c(total_slr, slr_sites)
     } 
@@ -332,21 +352,22 @@ for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
   paml_res_plus <- paml_results(paml_file)
   
   if (paml_res_plus[[2]] == FALSE) {
-    results_table[index,3] <- "Missing output"
+    results_table[index,4] <- "Missing output"
     paml_sites <- 0
     paml_site_names <- c()
     total_paml <- c(total_paml, paml_sites)
   } else {
     paml_res <- as.data.frame(paml_res_plus[[1]])
+    paml_res <- paml_res[which(paml_res[,2] >= 0.95),]
     
     if (nrow(paml_res) >= 1) {
       paml_sites <- nrow(paml_res)
-      results_table[index,3] <- paml_sites
+      results_table[index,4] <- paml_sites
       paml_site_names <- c(as.integer(rownames(paml_res)))
       total_paml <- c(total_paml,paml_sites)
     } else {
       paml_sites <- nrow(paml_res)
-      results_table[index,3] <- paml_sites
+      results_table[index,4] <- paml_sites
       paml_site_names <- c()
       total_paml <- c(total_paml,paml_sites)
     }
@@ -354,6 +375,11 @@ for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
   
   # add to site_table
   site_table <- site_table_rows(infile, "PAML", paml_site_names, site_table)
+  
+  # add to PAML_table
+  if (paml_res_plus[[2]] != FALSE) {
+    paml_lnL_table[index,] <- paml_res_plus[[4]]
+  }
   
   ###### FISHER TESTS AND INTERSECTS #######
   # count number of sites in total and number of sites found in each method
@@ -367,15 +393,15 @@ for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
   
   # TDG - SLR 
   total_sites_tdg_slr <- count_total_sites(tdg_res_plus, slr_res_plus, total_sites_tdg_slr)
-  results_table <- site_intersects(tdg_site_names, slr_site_names, results_table, index, 6)
+  results_table <- site_intersects(tdg_site_names, slr_site_names, results_table, index, 7)
 
   # TDG - PAML
   total_sites_tdg_paml <- count_total_sites(tdg_res_plus, paml_res_plus, total_sites_tdg_paml)
-  results_table <- site_intersects(tdg_site_names, paml_site_names, results_table, index, 5)
+  results_table <- site_intersects(tdg_site_names, paml_site_names, results_table, index, 6)
 
   # SLR - PAML
   total_sites_slr_paml <- count_total_sites(slr_res_plus, paml_res_plus, total_sites_slr_paml)
-  results_table <- site_intersects(slr_site_names, paml_site_names, results_table, index, 7)
+  results_table <- site_intersects(slr_site_names, paml_site_names, results_table, index, 8)
   
   
 #   # Intersects
@@ -421,14 +447,30 @@ for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
 # m <- matrix(c(total_intersect, sum(total_slr)-total_intersect, sum(total_tdg)-total_intersect, sum(total_sites)-(sum(total_slr)+sum(total_tdg))+total_intersect), nrow=2)
 # fisher.test(m, alternative="greater") 
 
+# For unfinished PAML jobs
+results_table_subset <- subset(results_table, PAML_sites != "Missing output")
+paml_idx <-results_table$PAML_sites != "Missing output"
+
+
 ## TDG-SLR ##
-methods_fishers(results_table, 6, total_tdg, total_slr, sum(total_sites_tdg_slr))
+fisher_tdg_slr <- methods_fishers(results_table, 7, total_tdg, total_slr, results_table$Alignment_Length, title= "tdg_slr")
+
+# unfinished PAML job specific
+fisher_tdg_slr <- methods_fishers(results_table[paml_idx,], 7, total_tdg[paml_idx], total_slr[paml_idx], results_table$Alignment_Length[paml_idx], title= "tdg_slr")
+
 
 ## TDG-PAML ##
-methods_fishers(results_table, 5, total_tdg, total_paml, sum(total_sites_tdg_paml))
+fisher_tdg_paml <- methods_fishers(results_table, 6, total_tdg, total_paml, results_table$Alignment_Length[paml_idx], title= "tdg_paml")
+
+# Unfinished PAML job specific
+fisher_tdg_paml <- methods_fishers(results_table[paml_idx, ], 6, total_tdg[paml_idx], total_paml[paml_idx], results_table$Alignment_Length[paml_idx], title="tdg_paml")
+
 
 ## SLR-PAML ##
-methods_fishers(results_table, 7, total_slr, total_paml, sum(total_sites_slr_paml))
+fisher_slr_paml <- methods_fishers(results_table[paml_idx, ], 8, total_slr[paml_idx], total_paml[paml_idx], sum(results_table$Alignment_Length[paml_idx]), title="slr_paml")
+
+# Unfinished PAML jobs specific
+fisher_slr_paml <- methods_fishers(results_table[paml_idx, ], 8, total_slr[paml_idx], total_paml[paml_idx], sum(results_table$Alignment_Length[paml_idx]), title="slr_paml")
   
 ######################################### Intersect shenanigans ########################################## 
 #names(exact_intersect) <- intersect_names
@@ -441,6 +483,28 @@ methods_fishers(results_table, 7, total_slr, total_paml, sum(total_sites_slr_pam
 site_table <- site_table[-1,]
 #site_table
 
+colnames(paml_lnL_table) <- c("infile", "Model_7", "Model_8", "deltalnL", "p_val")
+
 ######################################### Write to file ##########################################
 
+#dir.create(path="/home/gideon/Documents/mphil_internship/results_out")
+setwd("/home/gideon/Documents/mphil_internship/results_out")
+
+write.csv(site_table, file="sites.csv")
+write.csv(results_table, file="full_results.csv")
+
+sink("fisher_tests.txt")
+
+fisher_tdg_slr
+fisher_tdg_paml
+fisher_slr_paml
+sink()
+
+
+#write(fisher_tdg_paml, file="fisher_tests.txt")
+#write(fisher_tdg_slr, file="fisher_tests.txt", append = TRUE)
+#write(fisher_slr_paml, file="fisher_tests.txt", append = TRUE)
+
+#results_yaml <- as.yaml(list(site_table,full_results,list(fisher_tdg_slr,fisher_tdg_paml,fisher_slr_paml)), column.major = FALSE)
+#write(results_yaml, file="results_yaml")
 

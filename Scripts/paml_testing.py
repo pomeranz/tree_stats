@@ -75,7 +75,7 @@ for infile in glob(path.join(alignroot, "*/*.phy")):
     
     
     old_cml = codeml.Codeml()
-    old_cml.read_ctl_file(path.join(outroot, "template.ctl")
+    old_cml.read_ctl_file(path.join(outroot, "template.ctl"))
     old_cml.alignment = infile
     old_cml.tree = treefile
     old_cml.out_file = old_outfile
@@ -118,7 +118,7 @@ for infile in glob(path.join(alignroot, "*/*.phy")):
     
     
     new_cml = codeml.Codeml()
-    new_cml.read_ctl_file(path.join(outroot, "template.ctl")
+    new_cml.read_ctl_file(path.join(outroot, "template.ctl"))
     new_cml.alignment = infile
     new_cml.tree = treefile
     new_cml.out_file = old_outfile

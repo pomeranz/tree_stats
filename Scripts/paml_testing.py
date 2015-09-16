@@ -73,8 +73,6 @@ for infile in glob(path.join(alignroot, "*/*.phy")):
     check_dir(old_outdir)
     old_outfile = path.join(old_outdir, basename + ".mlc")
     
-    if os.getcwd() != old_outdir:
-        os.chdir(old_outdir)
     
     old_cml = codeml.Codeml()
     old_cml.read_ctl_file("template.ctl")
@@ -82,6 +80,9 @@ for infile in glob(path.join(alignroot, "*/*.phy")):
     old_cml.tree = treefile
     old_cml.out_file = old_outfile
     old_cml.working_dir = old_outdir
+    
+    if os.getcwd() != old_outdir:
+        os.chdir(old_outdir)
     
     # create ctl file
     old_ctlfile = "".join(old_outfile.split(".")[0] + ".ctl")
@@ -115,8 +116,6 @@ for infile in glob(path.join(alignroot, "*/*.phy")):
     check_dir(new_outdir)
     new_outfile = path.join(new_outdir, basename + ".mlc")
     
-    if os.getcwd() != new_outdir:
-        os.chdir(new_outdir)
     
     new_cml = codeml.Codeml()
     new_cml.read_ctl_file("template.ctl")
@@ -125,6 +124,8 @@ for infile in glob(path.join(alignroot, "*/*.phy")):
     new_cml.out_file = old_outfile
     new_cml.working_dir = old_outdir
     
+    if os.getcwd() != new_outdir:
+        os.chdir(new_outdir)
 
     # create ctl file
     new_ctlfile = "".join(new_outfile.split(".")[0] + ".ctl")

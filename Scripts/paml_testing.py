@@ -38,8 +38,8 @@ check_dir(out_pre_dir)
 logdir = path.join(outroot, "logs")
 check_dir(logdir)
 
-if os.getcwd() != outroot:
-    os.chdir(outroot)
+if os.getcwd() != out_pre_dir:
+    os.chdir(out_pre_dir)
     
 
 for infile in glob(path.join(alignroot, "*/*.phy")):

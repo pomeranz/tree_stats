@@ -64,8 +64,11 @@ for infile in glob(path.join(alignroot, "*/*.phy")):
     old_start_time = time.time()    
     
     # out directories
-    old_out_sub_dir = path.join(out_pre_dir,"old", prefix)
-    check_dir(old_out_sub_dir)
+    old_out_pre_sub_dir = path.join(out_pre_dir,"old")
+    check_dir(old_out_pre_sub_dir)
+    old_out_sub_dir = path.join(old_out_pre_sub_dir, prefix)
+    check_dir(old_out_sub_dir)   
+    
     old_outdir = path.join(old_out_sub_dir, basename)
     check_dir(old_outdir)
     old_outfile = path.join(old_outdir, basename + ".mlc")

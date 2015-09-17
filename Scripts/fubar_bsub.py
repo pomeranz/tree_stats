@@ -7,7 +7,7 @@ import re
 
 import utils
 
-fubar_cmd = "~sparks/hyphy-hyphyqt/HYPHYMP {}"
+fubar_cmd = "~sparks/hyphy-hyphyqt/HYPHYMP {0}"
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument('--clade', metavar='clade_name', type=str, required=True)

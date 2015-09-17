@@ -97,7 +97,7 @@ for infile in glob(path.join(alignroot, "*/*.phy")):
     
     # write time to a file
     
-    old_times = open(path.join(old_outdir,"times.txt"), "w")
+    old_times = open(path.join(old_outdir,"old_times.txt"), "w")
     old_times.write(old_human_time_start, old_human_time_end, old_start_time, old_end_time, old_runtime)
     
     
@@ -139,7 +139,11 @@ for infile in glob(path.join(alignroot, "*/*.phy")):
     new_runtime = new_end_time - new_start_time
     
     # write time to a file # finish this
-    new_times = open(path.join(new_outdir,"times.txt"), "w")
+     
+    if os.getcwd() != outroot:
+        os.chdir(outroot)
+    
+    new_times = open(path.join(new_outdir,"new_times.txt"), "w")
     new_times.write(new_human_time_start, new_human_time_end, new_start_time, new_end_time, new_runtime)
     
     

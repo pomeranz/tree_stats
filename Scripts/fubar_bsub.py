@@ -34,7 +34,7 @@ for infile in glob(path.join(inroot, args.clade, "*", "*_FUBAR.ctl")):
 
     fubar = fubar_cmd.format(infile)
 
-    p = Popen(['bsub', '-R', 'rusage[tmp=512]', '-o'+logfile, fubar])
+    p = Popen(['bsub', '-R', 'rusage[tmp=512]', '-o'+logfile, '-g', '/fubar', fubar])
         
     p.wait()
     

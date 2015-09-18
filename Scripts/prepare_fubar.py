@@ -54,6 +54,7 @@ def read_slr(fh):
 
 for f in glob.glob(path.join(args.indir, args.clade,
                              '*', '*_slr.paml')):
+                                 
     dirname, basename = path.split(f)
     input_name = basename.rpartition('.')[0]
     input_core = input_name.rpartition('_')[0]
@@ -61,7 +62,6 @@ for f in glob.glob(path.join(args.indir, args.clade,
     
     utils.check_dir(path.join(args.outdir, args.clade, basename[:2]))
     out_fasta = path.abspath(path.join(args.outdir, args.clade, basename[:2], input_core+'.fa'))
-    out_tree = path.abspath(path.join(args.outdir, args.clade, basename[:2], input_core+'.nwk'))
     SeqIO.write(seqs, out_fasta, 'fasta')
     
     with open(path.join(dirname, input_name+'.nwk')) as fl:
@@ -79,20 +79,16 @@ for f in glob.glob(path.join(args.indir, args.clade,
     for index,line in enumerate(fasta,start=1):
         if index%2 == 0:
             aln_ids[(index)/2] = line.strip("\n")
-            print line
-            print (index)/2
+            #print line
+            #print (index)/2
         
     for node in tree:
         if node.is_leaf():
             node.taxon.label = aln_ids[int(node.taxon.label)]
             
-    
-    #shutil.copy(path.join(dirname, input_name+'.nwk'),
-               # out_tree)
-    
-    print >>out_tree, tree.as_string('newick', suppress_rooting=True, 
-                                    suppress_internal_taxon_labels=True,
-                                    suppres_internal_node_labels=True)
+    # write out the new tree
+    out_tree = open(path.abspath(path.join(args.outdir, args.clade, basename[:2], input_core+'.nwk')), 'w')
+    out_tree.write(tree.as_string('newick', suppress_rooting=True))
 
     # Write out the control file
     control_file = open(path.join(args.outdir, args.clade, basename[:2], input_core + '_FUBAR.ctl'), 'w')

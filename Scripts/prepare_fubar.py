@@ -1,3 +1,7 @@
+"""
+'/home/gideon/Documents/mphil_internship/slr_prep_out/Eutheria/1/1_1_slr.paml'
+"""
+
 import os 
 from os import path as path
 import shutil
@@ -8,6 +12,8 @@ import argparse
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio import SeqIO
+from dendropy import Tree
+from ete2 import Tree
 
 # Generate FASTA files
 # Copy trees over?
@@ -57,8 +63,29 @@ for f in glob.glob(path.join(args.indir, args.clade,
     out_fasta = path.abspath(path.join(args.outdir, args.clade, basename[:2], input_core+'.fa'))
     out_tree = path.abspath(path.join(args.outdir, args.clade, basename[:2], input_core+'.nwk'))
     SeqIO.write(seqs, out_fasta, 'fasta')
-    shutil.copy(path.join(dirname, input_name+'.nwk'),
-                out_tree)
+    
+    tree = Tree.get_from_path(path.join(dirname, input_name+'.nwk'), 'newick', preserve_underscores=True)
+    # rewrite the numbered tree back to a tree with ids. 
+    # easy
+    fasta_file = open(f, 'r')
+    fasta = fasta_file.readlines()
+    aln_ids = {}
+    for index,line in enumerate(fasta,start=1):
+        
+        if index%2 == 0:
+            aln_ids[index] = line
+        
+    for node in tree:
+        if node.is_leaf():
+            node.taxon.label = aln_ids[node.taxon.label]
+            
+    
+    #shutil.copy(path.join(dirname, input_name+'.nwk'),
+               # out_tree)
+    
+    print >>out_tree, tree.as_string('newick', suppress_rooting=True, 
+                                    suppress_internal_taxon_labels=True,
+                                    suppres_internal_node_labels=True)
 
     # Write out the control file
     control_file = open(path.join(args.outdir, args.clade, basename[:2], input_core + '_FUBAR.ctl'), 'w')

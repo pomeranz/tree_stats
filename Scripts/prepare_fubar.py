@@ -62,7 +62,7 @@ for f in glob.glob(path.join(args.indir, args.clade,
     
     utils.check_dir(path.join(args.outdir, args.clade, basename[:2]))
     out_fasta = path.abspath(path.join(args.outdir, args.clade, basename[:2], input_core+'.fa'))
-    SeqIO.write(seqs, out_fasta, 'fasta')
+    SeqIO.write(seqs, open(out_fasta, 'w'), 'fasta')
     
     with open(path.join(dirname, input_name+'.nwk')) as fl:
         _ = fl.readline()
@@ -87,10 +87,11 @@ for f in glob.glob(path.join(args.indir, args.clade,
             node.taxon.label = aln_ids[int(node.taxon.label)]
             
     # write out the new tree
-    out_tree = open(path.abspath(path.join(args.outdir, args.clade, basename[:2], input_core+'.nwk')), 'w')
+    out_tree_name =path.abspath(path.join(args.outdir, args.clade, basename[:2], input_core+'.nwk'))
+    out_tree = open(out_tree_name, 'w')
     out_tree.write(tree.as_string('newick', suppress_rooting=True))
 
     # Write out the control file
     control_file = open(path.join(args.outdir, args.clade, basename[:2], input_core + '_FUBAR.ctl'), 'w')
     
-    print >>control_file, fubar_str % (out_fasta, out_tree)
+    print >>control_file, fubar_str % (out_fasta, out_tree_name)

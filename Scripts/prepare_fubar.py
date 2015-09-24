@@ -54,6 +54,7 @@ def read_slr(fh):
 
 for f in glob.glob(path.join(args.indir, args.clade,
                              '*', '*_slr.paml')):
+    print f
                                  
     dirname, basename = path.split(f)
     input_name = basename.rpartition('.')[0]

@@ -69,6 +69,9 @@ for infile in glob(path.join(alndir, "*", "*_prank.best.fas")):
     #treefile = path.join(treedir, basename + '.nh')
     # FIXME This is presumably for yeast
     treefile = path.join(treedir, 'RAxML_bestTree.' + basename)
+    
+    if os.path.isfile(treefile) == False:
+        continue
 
     outdir = path.join(slrdir, args.clade, prefix)
     utils.check_dir(outdir)

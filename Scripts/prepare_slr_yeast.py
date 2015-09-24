@@ -65,7 +65,7 @@ for infile in glob(path.join(alndir, "*", "*_prank.best.fas")):
     prefix = basename.partition('_')[0][:2]
 
     # treedir = path.join(treeroot, args.clade, prefix)
-    treedir = path.join(treeroot, args.clade, prefix)
+    treedir = path.join(treeroot, prefix)
     #treefile = path.join(treedir, basename + '.nh')
     # FIXME This is presumably for yeast
     treefile = path.join(treedir, 'RAxML_bestTree.' + basename)

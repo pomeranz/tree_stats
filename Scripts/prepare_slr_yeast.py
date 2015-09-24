@@ -61,7 +61,7 @@ for infile in glob(path.join(alndir, "*", "*_prank.best.fas")):
     print infile
     # i changed the way the basenmae is done
     basename = path.basename(infile).partition('.')[0]
-    basename = "".join(basename.split("_")[0] + "_" + basename.split("_")[1])
+    basename = basename.split("_")[0]
     prefix = basename.partition('_')[0][:2]
 
     # treedir = path.join(treeroot, args.clade, prefix)

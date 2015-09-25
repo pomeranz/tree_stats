@@ -41,8 +41,9 @@ for infile in glob(path.join(args.preproot, "*", "*.nwk")):
     tree = Tree.get_from_path(infile, 'newick', preserve_underscores=True)
     
     for node in tree:
-        if "." in node.taxon.label:
-            node.taxon.label = node.taxon.label.replace(".", "_")
+        if node.is_leaf():
+            if "." in node.taxon.label:
+                node.taxon.label = node.taxon.label.replace(".", "_")
             
     tree_file = open(infile, "r+")
     

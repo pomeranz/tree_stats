@@ -53,7 +53,7 @@ for infile in glob(path.join(args.preproot, "*", "*.nwk")):
     tree_file.close
     
     
-    fasta_file = path.join(args.preproot, "*", "*.fa")
+    fasta_file = open(path.join(args.preproot, "*", "*.fa"), "r+")
     
     text = fasta_file.read()
     text = text.replace(".", "")

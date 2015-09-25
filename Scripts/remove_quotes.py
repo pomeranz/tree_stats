@@ -36,14 +36,15 @@ for infile in glob(path.join(args.preproot, "*", "*.nwk")):
     tree_file.write(text)
     tree_file.truncate()
     tree_file.close()
+       
     
-    tree_file = path.join(args.preproot, prefix, basename + ".nwk")   
-    
-    tree = Tree.get_from_path(tree_file, 'newick', preserve_underscores=True)
+    tree = Tree.get_from_path(infile, 'newick', preserve_underscores=True)
     
     for node in tree:
         if "." in node.taxon.label:
             node.taxon.label = node.taxon.label.replace(".", "_")
+            
+    tree_file = open(infile, "r+")
     
     tree_file.seek(0)
     tree_file.write(tree)

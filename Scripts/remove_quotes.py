@@ -23,6 +23,8 @@ args = argparser.parse_args()
 
 for infile in glob(path.join(args.treeroot, "*", "*.nwk")):
     
+    print infile
+    
     tree_file = open(infile, "r+")
     
     basename = path.basename(infile).partition('.')[2]

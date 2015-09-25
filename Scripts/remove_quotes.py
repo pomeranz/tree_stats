@@ -48,7 +48,7 @@ for infile in glob(path.join(args.preproot, "*", "*.nwk")):
     tree_file = open(infile, "r+")
     
     tree_file.seek(0)
-    tree_file.write(tree)
+    tree_file.write(tree.as_string('newick'))
     tree_file.truncate()
     tree_file.close
     

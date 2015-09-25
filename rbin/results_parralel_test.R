@@ -1,3 +1,5 @@
+# Options
+options('redis:num'=TRUE)
 # Packages
 library(yaml)
 library(iterators)
@@ -294,7 +296,7 @@ setChunkSize(250)
 
 #sink("log_test.txt", append=TRUE)
 
-loop <- foreach(index = 1:length(iter), .inorder=FALSE, .maxcombine=250) %dopar% {
+loop <- foreach(index = 1:length(iter), .inorder=FALSE) %dopar% {
 # for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
   
   library(yaml)
@@ -471,6 +473,8 @@ loop <- foreach(index = 1:length(iter), .inorder=FALSE, .maxcombine=250) %dopar%
   
   # progress index
   #index = index + 1
+  
+  parallel_results <- list(results_table, site_table, paml_lnL_table)
   
 }
 

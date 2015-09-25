@@ -16,12 +16,12 @@ from dendropy import Tree
 
 argparser = argparse.ArgumentParser()
 
-argparser.add_argument('--treeroot', metavar='tree_root', type=str, required=True)
-argparser.add_argument('--fastaroot', metavar='fasta_root', type=str, required=True)
+argparser.add_argument('--preproot', metavar='tree_root', type=str, required=True)
+
 
 args = argparser.parse_args()
 
-for infile in glob(path.join(args.treeroot, "*", "*.nwk")):
+for infile in glob(path.join(args.preproot, "*", "*.nwk")):
     
     print infile
     
@@ -49,7 +49,7 @@ for infile in glob(path.join(args.treeroot, "*", "*.nwk")):
     tree_file.close
     
     
-    fasta_file = path.join(args.fastaroot, basename + "_prank.best.fas")
+    fasta_file = path.join(args.preproot, basename + ".fa")
     
     text = fasta_file.read()
     text = text.replace(".", "")

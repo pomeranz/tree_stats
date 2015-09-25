@@ -43,10 +43,10 @@ for infile in glob(path.join(args.treeroot, "*", "*.nwk")):
         if "." in node.taxon.label:
             node.taxon.label = node.taxon.label.replace(".", "_")
     
-     tree_file.seek(0)
-     tree_file.write(tree)
-     tree_file.truncate()
-     tree_file.close
+    tree_file.seek(0)
+    tree_file.write(tree)
+    tree_file.truncate()
+    tree_file.close
     
     
     fasta_file = path.join(args.fastaroot, basename + "_prank.best.fas")

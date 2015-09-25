@@ -281,20 +281,23 @@ intersect_names <- c()
 
 # prep parallel stuff
 iter <- Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))  # number of iteration
-#cl<-makeCluster(detectCores() - 6)
+#cl<-makeCluster(detectCores() - 4)
 #registerDoParallel(cl)
 
 # setup job queue
 # try to get this to work
 library(doRedis)
 registerDoRedis(queue="jobs")
-startLocalWorkers(n=6, queue="jobs")
-setChunkSize(250)
+# decide on number of cores to use
+startLocalWorkers(n=4, queue="jobs")
+setChunkSize(500)
 
 
 
 
 #sink("log_test.txt", append=TRUE)
+
+start_time <- Sys.time()
 
 loop <- foreach(index = 1:length(iter), .inorder=FALSE) %dopar% {
 # for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
@@ -478,10 +481,19 @@ loop <- foreach(index = 1:length(iter), .inorder=FALSE) %dopar% {
   
 }
 
+end_time = Sys.time()
+end_time - start_time
+
 removeQueue("jobs")
 
 #stopCluster(cl)
-#sink()
+
+
+# assign results out of loop
+results_table <- loop[[4151]][[1]]
+site_table <- loop[[4151]][[2]]
+paml_lnL_table <- loop[[4151]][[3]]
+
 
 ######################################### Fisher test ##########################################
 # how many times overlapped

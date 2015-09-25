@@ -27,9 +27,6 @@ for infile in glob(path.join(args.preproot, "*", "*.nwk")):
     
     tree_file = open(infile, "r+")
     
-    basename = path.basename(infile).partition('.')[2]
-    prefix = basename.partition('_')[0][:2]
-    
     text = tree_file.read()
     text = text.replace("'", "")
     tree_file.seek(0)
@@ -49,7 +46,7 @@ for infile in glob(path.join(args.preproot, "*", "*.nwk")):
     tree_file.close
     
     
-    fasta_file = path.join(args.preproot, basename + ".fa")
+    fasta_file = path.join(args.preproot, "*", "*.fa")
     
     text = fasta_file.read()
     text = text.replace(".", "")

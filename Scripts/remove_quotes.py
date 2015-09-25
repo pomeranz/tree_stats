@@ -25,7 +25,7 @@ for infile in glob(path.join(args.preproot, "*", "*.nwk")):
     
     print infile
     
-    basename = path.basename(infile).partition('.')[2]
+    basename = path.basename(infile).partition('.')[0]
     prefix = basename.partition('_')[0][:2]
     
     tree_file = open(infile, "r+")

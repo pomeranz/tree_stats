@@ -25,6 +25,9 @@ for infile in glob(path.join(args.preproot, "*", "*.nwk")):
     
     print infile
     
+    basename = path.basename(infile).partition('.')[2]
+    prefix = basename.partition('_')[0][:2]
+    
     tree_file = open(infile, "r+")
     
     text = tree_file.read()
@@ -34,7 +37,7 @@ for infile in glob(path.join(args.preproot, "*", "*.nwk")):
     tree_file.truncate()
     tree_file.close()
     
-    tree_file = path.join(args.preproot, "*", "*.nwk")   
+    tree_file = path.join(args.preproot, prefix, basename + ".nwk")   
     
     tree = Tree.get_from_path(tree_file, 'newick', preserve_underscores=True)
     

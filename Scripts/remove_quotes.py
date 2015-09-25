@@ -34,6 +34,8 @@ for infile in glob(path.join(args.preproot, "*", "*.nwk")):
     tree_file.truncate()
     tree_file.close()
     
+    tree_file = open(infile, "r+")    
+    
     tree = Tree.get_from_path(tree_file, 'newick', preserve_underscores=True)
     
     for node in tree:

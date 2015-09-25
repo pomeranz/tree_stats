@@ -59,5 +59,5 @@ for infile in glob(path.join(args.preproot, "*", "*.nwk")):
     text = text.replace(".", "")
     fasta_file.seek(0)
     fasta_file.write(text)
-    fasta_file.trunctuate()
+    fasta_file.truncate()
     fasta_file.close

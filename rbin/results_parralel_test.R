@@ -225,17 +225,20 @@ site_intersects <- function(method1_sites, method2_sites, results_table, index, 
     
     no_intersected_sites <- length(intersect(method1_sites, method2_sites))
     if (length(no_intersected_sites) == 0) {
-      results_table[index,column] <- 0
+      # results_table[index,column] <- 0
+      outcome <- 0
     } else {
-      results_table[index,column] <- no_intersected_sites
-      #results_table[index,7] <- tdg_slr_sites
+      # results_table[index,column] <- no_intersected_sites
+      outcome <- no_intersected_sites
     }
   } else {
-    results_table[index,column] <- 0
+    # results_table[index,column] <- 0
+    outcome <- 0
   }
   
-  return(results_table)
+  # return(results_table)
   
+  return(outcome)
 }
 
 methods_fishers <- function(results_table,column,total_method1,total_method2, total_sites, title) {
@@ -243,7 +246,7 @@ methods_fishers <- function(results_table,column,total_method1,total_method2, to
   # how many times overlapped
   total_intersect <- length(which(results_table[,column] != 0))
   
-  m <- matrix(c(total_intersect, sum(total_method2)-total_intersect, sum(total_method1)-total_intersect, sum(total_sites)-(sum(total_method2)+sum(total_method1))+total_intersect), nrow=2)
+  m <- matrix(c(total_intersect, sum(total_method2, na.rm=TRUE)-total_intersect, sum(total_method1, na.rm=TRUE)-total_intersect, sum(total_sites, na.rm=TRUE)-(sum(total_method2, na.rm=TRUE)+sum(total_method1, na.rm =TRUE))+total_intersect), nrow=2)
   print(m)
   x <- fisher.test(m, alternative="greater")
   x$data.name <- title
@@ -289,8 +292,8 @@ iter <- Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))  # number
 library(doRedis)
 registerDoRedis(queue="jobs")
 # decide on number of cores to use
-startLocalWorkers(n=4, queue="jobs")
-setChunkSize(500)
+startLocalWorkers(n=8, queue="jobs")
+#setChunkSize(500)
 
 
 
@@ -298,6 +301,8 @@ setChunkSize(500)
 #sink("log_test.txt", append=TRUE)
 
 start_time <- Sys.time()
+
+# rewrite the assignment to the results_table to making a vector and then just appending it.
 
 loop <- foreach(index = 1:length(iter), .inorder=FALSE) %dopar% {
 # for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
@@ -318,14 +323,14 @@ loop <- foreach(index = 1:length(iter), .inorder=FALSE) %dopar% {
   
   # get alignment length
   aln_length <- as.integer(summary(read.FASTA(infile))[,1][1])
-  results_table[index,2] <- aln_length
+  #results_table[index,2] <- aln_length
   
   # create basenames to acces the other files.
   basename = head(unlist(strsplit(tail(unlist(strsplit(infile, split="/")), n=1), split=".", fixed=TRUE)), n=1)
   basename = paste(unlist(strsplit(basename, split="_"))[1], unlist(strsplit(basename, split="_"))[2], sep="_")
   prefix = substr(unlist(strsplit(basename, split="_", fixed=TRUE))[1], 1, 2)
   
-  results_table[index,1] <- paste(basename, ".fa", sep="")
+  #results_table[index,1] <- paste(basename, ".fa", sep="")
   
   ### TDG09 ###
   tdg_file <- paste("/home/gideon/Documents/mphil_internship/tdg09_out/", prefix, "/", basename, ".txt", sep="")
@@ -336,17 +341,18 @@ loop <- foreach(index = 1:length(iter), .inorder=FALSE) %dopar% {
   tdg_sites <- nrow(tdg_res)
   
   if (tdg_res_plus[[2]] == FALSE) {
-    results_table[index,3] <- NA
+    #results_table[index,3] <- NA
+    tdg_sites <- NA
     tdg_site_names <- c()
     total_tdg <- c(total_tdg, 0)
   } else {
     if (tdg_sites == 0) {
-      results_table[index,3] <- tdg_sites
+      #results_table[index,3] <- tdg_sites
       tdg_site_names <- c()
       total_tdg <- c(total_tdg, 0)
     } else {
       tdg_sites <- nrow(tdg_res)
-      results_table[index,3] <- tdg_sites
+      #results_table[index,3] <- tdg_sites
       tdg_site_names <- tdg_res[,1]
       total_tdg <- c(total_tdg, tdg_sites)
     }
@@ -360,21 +366,21 @@ loop <- foreach(index = 1:length(iter), .inorder=FALSE) %dopar% {
   
   slr_res_plus <- slr_results(slr_file)
   if (slr_res_plus[[2]] == FALSE) {
-    results_table[index,5] <- NA
-    slr_sites <- 0
+    # results_table[index,5] <- NA
+    slr_sites <- NA
     slr_site_names <- c()
-    total_slr <- c(total_slr, slr_sites)
+    total_slr <- c(total_slr, 0)
   } else {
     slr_res <- as.data.frame(slr_res_plus[1])
     
     if (nrow(slr_res) >= 1) {
       slr_sites <- nrow(slr_res)
-      results_table[index,5] <- slr_sites
+      #results_table[index,5] <- slr_sites
       slr_site_names <- c(as.integer(rownames(slr_res)))
       total_slr <- c(total_slr, slr_sites)
     } else {
       slr_sites <- nrow(slr_res)
-      results_table[index,5] <- slr_sites
+      # results_table[index,5] <- slr_sites
       slr_site_names <- c()
       total_slr <- c(total_slr, slr_sites)
     } 
@@ -389,22 +395,22 @@ loop <- foreach(index = 1:length(iter), .inorder=FALSE) %dopar% {
   paml_res_plus <- paml_results(paml_file)
   
   if (paml_res_plus[[2]] == FALSE) {
-    results_table[index,4] <- NA
-    paml_sites <- 0
+    #results_table[index,4] <- NA
+    paml_sites <- NA
     paml_site_names <- c()
-    total_paml <- c(total_paml, paml_sites)
+    total_paml <- c(total_paml, 0)
   } else {
     paml_res <- as.data.frame(paml_res_plus[[1]])
     paml_res <- paml_res[which(paml_res[,2] >= 0.95),]
     
     if (nrow(paml_res) >= 1) {
       paml_sites <- nrow(paml_res)
-      results_table[index,4] <- paml_sites
-      paml_site_names <- c(as.integer(paml_res[1,]))
+      #results_table[index,4] <- paml_sites
+      paml_site_names <- c(as.integer(paml_res[,1]))
       total_paml <- c(total_paml,paml_sites)
     } else {
       paml_sites <- nrow(paml_res)
-      results_table[index,4] <- paml_sites
+      #results_table[index,4] <- paml_sites
       paml_site_names <- c()
       total_paml <- c(total_paml,paml_sites)
     }
@@ -415,10 +421,13 @@ loop <- foreach(index = 1:length(iter), .inorder=FALSE) %dopar% {
   
   # add to PAML_table
   if (paml_res_plus[[2]] != FALSE) {
-    paml_lnL_table[index,] <- paml_res_plus[[4]]
+    #paml_lnL_table[index,] <- paml_res_plus[[4]]
+    paml_lnL_table <- rbind(paml_lnL_table, paml_res_plus[[4]])
   } else {
-    paml_lnL_table[index,] <- c("No run", NA, NA, NA, NA)
+    #paml_lnL_table[index,] <- c("No run", NA, NA, NA, NA)
+    paml_lnL_table <- rbind(paml_lnL_table,  c("No run", NA, NA, NA, NA))
   }
+    
   
   ###### FISHER TESTS AND INTERSECTS #######
   # count number of sites in total and number of sites found in each method
@@ -432,15 +441,18 @@ loop <- foreach(index = 1:length(iter), .inorder=FALSE) %dopar% {
   
   # TDG - SLR 
   total_sites_tdg_slr <- count_total_sites(tdg_res_plus, slr_res_plus, total_sites_tdg_slr)
-  results_table <- site_intersects(tdg_site_names, slr_site_names, results_table, index, 7)
+  #results_table <- site_intersects(tdg_site_names, slr_site_names, results_table, index, 7)
+  int_tdg_slr <- site_intersects(tdg_site_names, slr_site_names, results_table, index, 7)
   
   # TDG - PAML
   total_sites_tdg_paml <- count_total_sites(tdg_res_plus, paml_res_plus, total_sites_tdg_paml)
-  results_table <- site_intersects(tdg_site_names, paml_site_names, results_table, index, 6)
+  #results_table <- site_intersects(tdg_site_names, paml_site_names, results_table, index, 6)
+  int_tdg_paml <- site_intersects(tdg_site_names, paml_site_names, results_table, index, 6)
   
   # SLR - PAML
   total_sites_slr_paml <- count_total_sites(slr_res_plus, paml_res_plus, total_sites_slr_paml)
-  results_table <- site_intersects(slr_site_names, paml_site_names, results_table, index, 8)
+  #results_table <- site_intersects(slr_site_names, paml_site_names, results_table, index, 8)
+  int_slr_paml <- site_intersects(slr_site_names, paml_site_names, results_table, index, 8)
   
   
   #   # Intersects
@@ -477,7 +489,10 @@ loop <- foreach(index = 1:length(iter), .inorder=FALSE) %dopar% {
   # progress index
   #index = index + 1
   
-  parallel_results <- list(results_table, site_table, paml_lnL_table)
+  # assign results_table rows manually
+  results_table <- rbind(results_table, c(paste(basename, ".fa", sep=""), aln_length, tdg_sites, paml_sites, slr_sites, int_tdg_slr, int_tdg_paml, int_slr_paml))
+  
+  parallel_results <- list(results_table, site_table, paml_lnL_table, tdg_sites, paml_sites, slr_sites)
   
 }
 
@@ -489,10 +504,38 @@ removeQueue("jobs")
 #stopCluster(cl)
 
 
+################################### Assign and fix ######################################
+
 # assign results out of loop
 results_table <- loop[[4151]][[1]]
 site_table <- loop[[4151]][[2]]
 paml_lnL_table <- loop[[4151]][[3]]
+
+tdg_sites <- c()
+paml_sites <- c()
+slr_sites <- c()
+# assign the sites to vectors
+for (j in 1:length(iter)) {
+  tdg_sites <- c(tdg_sites, loop[[j]][[4]])
+  paml_sites <- c(paml_sites, loop[[j]][[5]])
+  slr_sites <- c(slr_sites, loop[[j]][[6]])
+}
+
+
+
+
+results_table <- results_table[2:nrow(results_table),]
+site_table <- site_table[2:nrow(site_table),]
+paml_lnL_table <- paml_lnL_table[2:nrow(paml_lnL_table),]
+
+results_table$Alignment_Length <- as.integer(results_table$Alignment_Length)
+results_table$TDG09_sites <- as.integer(results_table$TDG09_sites)
+results_table$PAML_sites <- as.integer(results_table$PAML_sites)
+results_table$SLR_sites <- as.integer(results_table$SLR_sites)
+results_table$TDG09_PAML <- as.integer(results_table$TDG09_PAML)
+results_table$TDG09_SLR <- as.integer(results_table$TDG09_SLR)
+results_table$SLR_PAML <- as.integer(results_table$SLR_PAML)
+
 
 
 ######################################### Fisher test ##########################################
@@ -506,23 +549,27 @@ paml_lnL_table <- loop[[4151]][[3]]
 #results_table_subset <- subset(results_table, PAML_sites != "Missing output")
 #paml_idx <-results_table$PAML_sites != "Missing output"
 
+# test specific remove NA?
 
 ## TDG-SLR ##
-fisher_tdg_slr <- methods_fishers(results_table, 7, total_tdg, total_slr, results_table$Alignment_Length, title= "tdg_slr")
+#fisher_tdg_slr <- methods_fishers(results_table, 7, total_tdg, total_slr, results_table$Alignment_Length, title= "tdg_slr")
+fisher_tdg_slr <- methods_fishers(results_table, 7, tdg_sites, slr_sites, results_table$Alignment_Length, title= "tdg_slr")
 
 # unfinished PAML job specific
 #fisher_tdg_slr <- methods_fishers(results_table[paml_idx,], 7, total_tdg[paml_idx], total_slr[paml_idx], results_table$Alignment_Length[paml_idx], title= "tdg_slr")
 
 
 ## TDG-PAML ##
-fisher_tdg_paml <- methods_fishers(results_table, 6, total_tdg, total_paml, results_table$Alignment_Length[paml_idx], title= "tdg_paml")
+#fisher_tdg_paml <- methods_fishers(results_table, 6, total_tdg, total_paml, results_table$Alignment_Length, title= "tdg_paml")
+fisher_tdg_paml <- methods_fishers(results_table, 6, tdg_sites, paml_sites, results_table$Alignment_Length, title= "tdg_paml")
 
 # Unfinished PAML job specific
 #fisher_tdg_paml <- methods_fishers(results_table[paml_idx, ], 6, total_tdg[paml_idx], total_paml[paml_idx], results_table$Alignment_Length[paml_idx], title="tdg_paml")
 
 
 ## SLR-PAML ##
-fisher_slr_paml <- methods_fishers(results_table, 8, total_slr, total_paml, sum(results_table$Alignment_Length), title="slr_paml")
+#fisher_slr_paml <- methods_fishers(results_table, 8, total_slr, total_paml, sum(results_table$Alignment_Length), title="slr_paml")
+fisher_slr_paml <- methods_fishers(results_table, 8, slr_sites, paml_sites, sum(results_table$Alignment_Length), title="slr_paml")
 
 # Unfinished PAML jobs specific
 #fisher_slr_paml <- methods_fishers(results_table[paml_idx, ], 8, total_slr[paml_idx], total_paml[paml_idx], sum(results_table$Alignment_Length[paml_idx]), title="slr_paml")
@@ -535,7 +582,7 @@ fisher_slr_paml <- methods_fishers(results_table, 8, total_slr, total_paml, sum(
 
 # results_table
 # I'm sure there is a better way for this!
-site_table <- site_table[-1,]
+#site_table <- site_table[-1,]
 #site_table
 
 colnames(paml_lnL_table) <- c("infile", "Model_7", "Model_8", "deltalnL", "p_val")

@@ -237,7 +237,7 @@ site_intersects <- function(method1_sites, method2_sites, results_table, index, 
 methods_fishers <- function(results_table,column,total_method1,total_method2, total_sites, title) {
   
   # how many times overlapped
-  total_intersect <- length(which(results_table[,column] != "No intersects" & results_table[,column] != 0))
+  total_intersect <- length(which(results_table[,column] != 0))
   
   m <- matrix(c(total_intersect, sum(total_method2)-total_intersect, sum(total_method1)-total_intersect, sum(total_sites)-(sum(total_method2)+sum(total_method1))+total_intersect), nrow=2)
   print(m)
@@ -300,7 +300,7 @@ for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
   tdg_sites <- nrow(tdg_res)
   
   if (tdg_res_plus[[2]] == FALSE) {
-    results_table[index,3] <- "Missing output"
+    results_table[index,3] <- NA
     tdg_site_names <- c()
     total_tdg <- c(total_tdg, 0)
   } else {
@@ -324,7 +324,7 @@ for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
   
   slr_res_plus <- slr_results(slr_file)
   if (slr_res_plus[[2]] == FALSE) {
-    results_table[index,5] <- "Missing output"
+    results_table[index,5] <- NA
     slr_sites <- 0
     slr_site_names <- c()
     total_slr <- c(total_slr, slr_sites)
@@ -353,7 +353,7 @@ for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
   paml_res_plus <- paml_results(paml_file)
   
   if (paml_res_plus[[2]] == FALSE) {
-    results_table[index,4] <- "Missing output"
+    results_table[index,4] <- NA
     paml_sites <- 0
     paml_site_names <- c()
     total_paml <- c(total_paml, paml_sites)
@@ -364,7 +364,7 @@ for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
     if (nrow(paml_res) >= 1) {
       paml_sites <- nrow(paml_res)
       results_table[index,4] <- paml_sites
-      paml_site_names <- c(as.integer(paml_res[1,]))
+      paml_site_names <- c(as.integer(paml_res[,1]))
       total_paml <- c(total_paml,paml_sites)
     } else {
       paml_sites <- nrow(paml_res)
@@ -380,6 +380,8 @@ for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
   # add to PAML_table
   if (paml_res_plus[[2]] != FALSE) {
     paml_lnL_table[index,] <- paml_res_plus[[4]]
+  } else {
+    paml_lnL_table[index,] <- c("No run", NA, NA, NA, NA)
   }
   
   ###### FISHER TESTS AND INTERSECTS #######
@@ -493,9 +495,9 @@ results_table_test <- results_table
 results_table_test$PAML_sites[which(paml_lnL_table$p_val > 0.05)] <- 0
 
 # remove any entries where either method doesnt have a results
-results_table_test <- subset(results_table_test, results_table$PAML_sites != "Missing output")
-results_table_test <- subset(results_table_test, results_table_test$SLR_sites != "Missing output")
-results_table_test <- subset(results_table_test, results_table_test$TDG09_sites != "Missing output")
+results_table_test <- subset(results_table_test, results_table$PAML_sites != NA)
+results_table_test <- subset(results_table_test, results_table_test$SLR_sites != NA)
+results_table_test <- subset(results_table_test, results_table_test$TDG09_sites != NA)
 
 # convert them to numbers
 results_table_test$TDG09_sites <- as.integer(results_table_test$TDG09_sites)
@@ -508,34 +510,11 @@ results_table_test$SLR_sites <- as.integer(results_table_test$SLR_sites)
 ######################################### Inscpect results ########################################## 
 
 # find sites where slr and paml intersect
-results_table_comp <- results_table_test[which(results_table_test$SLR_PAML != "No intersects") ,]
+
 results_table_comp$SLR_PAML <- as.integer(results_table_comp$SLR_PAML)
 results_table_comp[which(results_table_comp$SLR_PAML != 0),]
 
-# comparing SLR to PAML
-# only take hits where PAML was singificant
 
-
-comp_slr_paml <- results_table[which(paml_lnL_table$p_val <= 0.05),]
-
-# now find the files where they intersected
-comp_slr_paml[which(comp_slr_paml$SLR_PAML != "No intersects"),]
-
-results_table_subset2 <- subset(comp_slr_paml, PAML_sites != "Missing output")
-paml_idx2 <-comp_slr_paml$PAML_sites != "Missing output"
-
-which(results_table[which(paml_lnL_table$p_val <= 0.05),]$SLR_PAML != "No intersects" )
-
-# in results_table subset it to the files where paml is significant. 
-# then check the fisher test between all 3 comparisons. 
-
-results_table_subset <- subset(results_table, results_table$PAML_sites != "Missing output")
-results_table_subset <- subset(results_table_subset, results_table_subset$SLR_sites != "Missing output")
-results_table_subset <- subset(results_table_subset, results_table_subset$TDG09_sites != "Missing output")
-
-results_table_subset$TDG09_sites <- as.integer(results_table_subset$TDG09_sites)
-results_table_subset$PAML_sites <- as.integer(results_table_subset$PAML_sites)
-results_table_subset$SLR_sites <- as.integer(results_table_subset$SLR_sites)
 
 # for greg
 # find about 5 files were paml finds way more sites than slr
@@ -543,17 +522,17 @@ paml_too_much <- results_table_subset[which(results_table_subset$PAML_sites > re
 paml_too_much <- paml_too_much[which(paml_too_much$SLR_sites != 0),]
 
 # only rows that have all the entries
-done_files <- which(results_table$PAML_sites != "Missing output" & results_table$TDG09_sites != "Missing output" & results_table$SLR_sites != "Missing output")
+#done_files <- which(results_table$PAML_sites != "Missing output" & results_table$TDG09_sites != "Missing output" & results_table$SLR_sites != "Missing output")
 
-fisher_tdg_slr <- methods_fishers(results_table[done_files,], 7, total_tdg[done_files], total_slr[done_files], results_table$Alignment_Length[done_files], title= "tdg_slr")
+#fisher_tdg_slr <- methods_fishers(results_table[done_files,], 7, total_tdg[done_files], total_slr[done_files], results_table$Alignment_Length[done_files], title= "tdg_slr")
 
-fisher_tdg_paml <- methods_fishers(results_table[done_files, ], 6, total_tdg[done_files], total_paml[done_files], results_table$Alignment_Length[done_files], title="tdg_paml")
+#fisher_tdg_paml <- methods_fishers(results_table[done_files, ], 6, total_tdg[done_files], total_paml[done_files], results_table$Alignment_Length[done_files], title="tdg_paml")
 
-fisher_slr_paml <- methods_fishers(results_table[done_files, ], 8, total_slr[done_files], total_paml[done_files], sum(results_table$Alignment_Length[done_files]), title="slr_paml")
+#fisher_slr_paml <- methods_fishers(results_table[done_files, ], 8, total_slr[done_files], total_paml[done_files], sum(results_table$Alignment_Length[done_files]), title="slr_paml")
 
-results_table_subset <- results_table[done_files,]
+#results_table_subset <- results_table[done_files,]
 
-results_table_subset[which(results_table_subset$TDG09_PAML != "No intersects" & results_table_subset$TDG09_SLR != "No intersects" & results_table_subset$SLR_PAML != "No intersects"),]
+#results_table_subset[which(results_table_subset$TDG09_PAML != "No intersects" & results_table_subset$TDG09_SLR != "No intersects" & results_table_subset$SLR_PAML != "No intersects"),]
 
 ######################################### Write to file ##########################################
 

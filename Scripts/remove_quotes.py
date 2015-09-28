@@ -28,17 +28,6 @@ for infile in glob(path.join(args.preproot, "*", "*.nwk")):
     basename = path.basename(infile).partition('.')[0]
     prefix = basename.partition('_')[0][:2]
     
-    tree_file = open(infile, "r+")
-    
-    # doesnt seem to remove quotes. 
-    # rerun prep_fubar then swap this and the next thing around. 
-    text = tree_file.read()
-    text = text.replace("'", "")
-    tree_file.seek(0)
-    tree_file.write(text)
-    tree_file.truncate()
-    tree_file.close()
-       
     
     tree = Tree.get_from_path(infile, 'newick', preserve_underscores=True)
     
@@ -53,6 +42,20 @@ for infile in glob(path.join(args.preproot, "*", "*.nwk")):
     tree_file.write(tree.as_string('newick'))
     tree_file.truncate()
     tree_file.close
+    
+    # remove quotes
+    tree_file = open(infile, "r+")
+    
+    # doesnt seem to remove quotes. 
+    # rerun prep_fubar then swap this and the next thing around. 
+    text = tree_file.read()
+    text = text.replace("'", "")
+    tree_file.seek(0)
+    tree_file.write(text)
+    tree_file.truncate()
+    tree_file.close()    
+    
+    
     
     
     fasta_file = open(path.join(args.preproot, prefix, basename + ".fa"), "r+")

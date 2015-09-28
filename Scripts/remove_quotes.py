@@ -34,7 +34,7 @@ for infile in glob(path.join(args.preproot, "*", "*.nwk")):
     for node in tree:
         if node.is_leaf():
             if "." in node.taxon.label:
-                node.taxon.label = node.taxon.label.replace(".", "_")
+                node.taxon.label = node.taxon.label.replace(".", "")
             
     tree_file = open(infile, "r+")
     

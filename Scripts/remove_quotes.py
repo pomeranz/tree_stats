@@ -30,6 +30,8 @@ for infile in glob(path.join(args.preproot, "*", "*.nwk")):
     
     tree_file = open(infile, "r+")
     
+    # doesnt seem to remove quotes. 
+    # rerun prep_fubar then swap this and the next thing around. 
     text = tree_file.read()
     text = text.replace("'", "")
     tree_file.seek(0)

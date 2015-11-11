@@ -210,11 +210,11 @@ def tree_stats(directory, filename="tree_stats_output.csv",
     ## WRITE TO FILE
     
     # create the column names
-    colnames = ["Directory", "Length", "Biggest Branch", "Smallest Branch", 
-                  "Farthest Leaf Name", "Distance of farthest leaf", 
-                  "Closest Leaf Name", "Distance of closest leaf", 
-                  "# of Leaves", "# of Species", "# of Paralogs", 
-                  "# of Human seqs"]
+    colnames = ["Directory", "Length", "Biggest_Branch", "Smallest_Branch", 
+                  "Farthest_Leaf_Name", "Distance_of_farthest_leaf", 
+                  "Closest_Leaf_Name", "Distance_of_closest_leaf", 
+                  "no_of_Leaves", "no_of_Species", "no_of_Paralogs", 
+                  "no_of_Human seqs"]
                   
     output_file = ''.join([output_directory + "/" + filename ])
     

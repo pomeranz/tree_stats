@@ -292,7 +292,7 @@ iter <- Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))  # number
 library(doRedis)
 registerDoRedis(queue="jobs")
 # decide on number of cores to use
-startLocalWorkers(n=8, queue="jobs")
+startLocalWorkers(n=6, queue="jobs")
 #setChunkSize(500)
 
 
@@ -652,3 +652,5 @@ sink()
 
 #results_yaml <- as.yaml(list(site_table,full_results,list(fisher_tdg_slr,fisher_tdg_paml,fisher_slr_paml)), column.major = FALSE)
 #write(results_yaml, file="results_yaml")
+
+setwd("/home/gideon/Documents/mphil_internship/")

@@ -74,6 +74,12 @@ slr_results <- function(infile) {
   cn <- c("Neutral", "Optimal", "omega", "lower", "upper", "LRT_Stat", "Pval", "Adj.Pval", "Q-value", "Result", "Note")
   
   slr_results <- read.fwf(infile, widths=c(9, 8, 9, 9, 9, 7, 9, 10, 11, 11, 7, 12), header=F, row.names=1, as.is=T)
+  colnames(slr_results) <- cn
+  
+  slr_results$omega <- gsub(" ", "", substr(slr_results$omega, 1, nchar(slr_results$omega)-1), fixed=TRUE)
+  slr_results$omega <- as.numeric(slr_results$omega)
+  slr_results$Adj.Pval <- gsub(" ", "", substr(slr_results$Adj.Pval, 1, nchar(slr_results$Adj.Pval)-1), fixed=TRUE)
+  slr_results$Adj.Pval <- as.numeric(slr_results$Adj.Pval)
   
   colnames(slr_results) <- cn
   
@@ -292,7 +298,7 @@ for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
   results_table[index,1] <- paste(basename, ".fa", sep="")
   
   ### TDG09 ###
-  tdg_file <- paste("/home/gideon/Documents/mphil_internship/tdg09_out/", prefix, "/", basename, ".txt", sep="")
+  tdg_file <- paste("/home/gideon/Documents/mphil_internship/tdg09/tdg09_out/", prefix, "/", basename, ".txt", sep="")
   
   tdg_res_plus <- tdg09_results(tdg_file)
   
@@ -463,7 +469,7 @@ fisher_tdg_slr <- methods_fishers(results_table, 7, total_tdg, total_slr, result
 
 
 ## TDG-PAML ##
-fisher_tdg_paml <- methods_fishers(results_table, 6, total_tdg, total_paml, results_table$Alignment_Length[paml_idx], title= "tdg_paml")
+fisher_tdg_paml <- methods_fishers(results_table, 6, total_tdg, total_paml, results_table$Alignment_Length, title= "tdg_paml")
 
 # Unfinished PAML job specific
 #fisher_tdg_paml <- methods_fishers(results_table[paml_idx, ], 6, total_tdg[paml_idx], total_paml[paml_idx], results_table$Alignment_Length[paml_idx], title="tdg_paml")
@@ -483,7 +489,8 @@ fisher_slr_paml <- methods_fishers(results_table, 8, total_slr, total_paml, sum(
 
 # results_table
 # I'm sure there is a better way for this!
-site_table <- site_table[-1,]
+site_table <- site_table[2:nrow(site_table),]
+rownames(site_table) <- as.integer(rownames(site_table)) - 1
 #site_table
 
 colnames(paml_lnL_table) <- c("infile", "Model_7", "Model_8", "deltalnL", "p_val")
@@ -500,10 +507,45 @@ results_table_test <- subset(results_table_test, results_table_test$SLR_sites !=
 results_table_test <- subset(results_table_test, results_table_test$TDG09_sites != NA)
 
 # convert them to numbers
-results_table_test$TDG09_sites <- as.integer(results_table_test$TDG09_sites)
+results_table_test$TDG09_sites <- as.numeric(results_table_test$TDG09_sites)
 results_table_test$PAML_sites <- as.integer(results_table_test$PAML_sites)
 results_table_test$SLR_sites <- as.integer(results_table_test$SLR_sites)
+results_table_test$TDG09_PAML <- as.integer(results_table_test$TDG09_PAML)
+results_table_test$TDG09_SLR <- as.integer(results_table_test$TDG09_SLR)
+results_table_test$SLR_PAML <- as.integer(results_table_test$SLR_PAML)
 
+######################################### Inscpect results ########################################## 
+
+
+# TDG09
+results_table_test[which(results_table_test$TDG09_sites != 0 & results_table_test$TDG09_sites != "Missing output"),]
+# number of alignments with sites under positive selection 
+length(which(results_table_test$TDG09_sites != 0))  # 939
+# overlaps with paml
+results_table_test[which(results_table_test$TDG09_PAML != 0 & results_table_test$TDG09_PAML != "No intersects"),]  # 65
+# overlaps with slr
+results_table_test[which(results_table_test$TDG09_SLR != 0 & results_table_test$TDG09_SLR != "No intersects"),]  # 25
+
+# PAML
+results_table_test[which(results_table_test$PAML_sites != 0) ,]
+# number of sites under positive selection
+length(which(results_table_test$PAML_sites != 0))  # 264
+
+# Overlap TDG and PAML
+# alignment 17/178_5
+results_table_test[which(results_table_test$TDG09_PAML != 0 & results_table_test$PAML_sites != 0),]
+# sites that are under positive selection
+site_table[which(site_table$file == "/paml_out/out/17/178_5/rst"),]
+site_table[which(site_table$file == "/tdg09_out/17/178_5.txt"),]
+
+# SLR
+results_table_test[which(results_table_test$SLR_sites != 0) ,]
+length(which(results_table_test$SLR_sites != 0))  # 845
+
+# Overlap TDG and SLR
+temp_1 <- site_table[which(site_table$file == "/slr_out/Eutheria/7/7_3_matched.res"),]
+temp_2 <- site_table[which(site_table$file == "/tdg09_out/7/7_3.txt"),]
+intersect(temp_1$site, temp_2$site)
 
 
 
@@ -554,3 +596,4 @@ sink()
 #results_yaml <- as.yaml(list(site_table,full_results,list(fisher_tdg_slr,fisher_tdg_paml,fisher_slr_paml)), column.major = FALSE)
 #write(results_yaml, file="results_yaml")
 
+setwd("/home/gideon/Documents/mphil_internship/")

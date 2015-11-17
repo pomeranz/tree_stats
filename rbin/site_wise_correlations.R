@@ -230,26 +230,31 @@ fubar_results <- function(infile) {
 
 ########################################## Plot saving fucntion ##################################################
 
-# not working for some reason
 plot_create <- function(name, subdir, basename, points1, points2) {
   
   if (name == "PAML_SLR") {
     setwd(paste("/home/gideon/Documents/mphil_internship/results_out/correlation_analysis/PAML_SLR/", subdir, "/",sep = ""))
-    png(basename)
+    pdf(basename)
     plot(points1,points2, xlab="PAML_omega", ylab="SLR_omega", main = paste("Correlation of omega values PAML_SLR of file", basename, sep=" "))
     abline(a=0, b=1, col="red")
+    rect(1,0,max(points1, na.rm=T), max(points2, na.rm=T), col=rgb(1,0,0,alpha=0.1), border=NA)
+    rect(0,1,max(points1, na.rm=T), max(points2, na.rm=T), col=rgb(1,0,0,alpha=0.1), border=NA)
     dev.off()
   } else if (name == "PAML_FUBAR") {
     setwd(paste("/home/gideon/Documents/mphil_internship/results_out/correlation_analysis/PAML_FUBAR/", subdir, sep = ""))
-    png(basename)
+    pdf(basename)
     plot(points1,points2, xlab="PAML_omega", ylab="FUBAR_omega", main = paste("Correlation of omega values PAML_FUBAR of file", basename, sep=" "))
     abline(a=0, b=1, col="red")
+    rect(1,0,max(points1, na.rm=T), max(points2, na.rm=T), col=rgb(1,0,0,alpha=0.1), border=NA)
+    rect(0,1,max(points1, na.rm=T), max(points2, na.rm=T), col=rgb(1,0,0,alpha=0.1), border=NA)
     dev.off()
   } else {
     setwd(paste("/home/gideon/Documents/mphil_internship/results_out/correlation_analysis/SLR_FUBAR/", subdir, sep = ""))
-    png(basename)
+    pdf(basename)
     plot(points1,points2, xlab="SLR_omega", ylab="FUBAR_omega", main = paste("Correlation of omega values SLR_FUBAR of file", basename, sep=" "))
     abline(a=0, b=1, col="red")
+    rect(1,0,max(points1, na.rm=T), max(points2, na.rm=T), col=rgb(1,0,0,alpha=0.1), border=NA)
+    rect(0,1,max(points1, na.rm=T), max(points2, na.rm=T), col=rgb(1,0,0,alpha=0.1), border=NA)
     dev.off()
   }
 } 

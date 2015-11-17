@@ -71,30 +71,60 @@ slr_results <- function(infile) {
     return(list("No data available", run, 0))
   }
   
-  cn <- c("Neutral", "Optimal", "omega", "lower", "upper", "LRT_Stat", "Pval", "Adj.Pval", "Q-value", "Result", "Note")
+  cn <- c("Site", "Neutral", "Optimal", "omega", "lower", "upper", "LRT_Stat", "Pval", "Adj.Pval", "Q-value")
   
-  slr_results <- read.fwf(infile, widths=c(9, 8, 9, 9, 9, 7, 9, 10, 11, 11, 7, 12), header=F, row.names=1, as.is=T)
-  colnames(slr_results) <- cn
+  slr_result <- read.table(infile, fill = TRUE, row.names=NULL, header = FALSE)
   
-  slr_results$omega <- gsub(" ", "", substr(slr_results$omega, 1, nchar(slr_results$omega)-1), fixed=TRUE)
-  slr_results$omega <- as.numeric(slr_results$omega)
-  slr_results$Adj.Pval <- gsub(" ", "", substr(slr_results$Adj.Pval, 1, nchar(slr_results$Adj.Pval)-1), fixed=TRUE)
-  slr_results$Adj.Pval <- as.numeric(slr_results$Adj.Pval)
-  
-  colnames(slr_results) <- cn
+  if (any(slr_result[,8] != "NA")) {
+    slr_result <- slr_result[which(slr_result[,8] != "NA"),]
+  }
   
   
-  signif_vals <- which(slr_results$Adj.Pval <= 0.05 & slr_results$omega > 1.0)  # Which hits
+  if (any(slr_result[,1] == "char")) {
+    slr_result <- slr_result[-which(slr_result[,1] == "char"),]
+  }
+  
+  if (any(slr_result[,1] == "gaps")) {
+    slr_result <- slr_result[-which(slr_result[,1] == "gaps"),]
+  }
+  
+  if (any(slr_result[,1] == "Constant")) {
+    slr_result <- slr_result[-which(slr_result[,1] == "Constant"),]
+  }
+  
+  if (any(slr_result[,1] == "Synonymous")) {
+    slr_result <- slr_result[-which(slr_result[,1] == "Synonymous"),]
+  }
+  
+  if (any(slr_result[,1] == "Single")) {
+    slr_result <- slr_result[-which(slr_result[,1] == "Single"),]
+  }
+  
+  if (any(slr_result[,1] == "!")) {
+    slr_result <- slr_result[-which(slr_result[,1] == "!"),]
+  }
+  
+  if (any(slr_result[,1] == "All")) {
+    slr_result <- slr_result[-which(slr_result[,1] == "All"),]
+  }
+  
+  rownames(slr_result) <- NULL
+  slr_result <- slr_result[,1:10]
+  
+  colnames(slr_result) <- cn
+  
+  
+  signif_vals <- which(slr_result$Adj.Pval <= 0.05 & slr_result$omega > 1.0)  # Which hits
   no_signifs <- length(signif_vals)
   
-  output <- slr_results[signif_vals,]
+  output <- slr_result[signif_vals,]
   
   final_out <- output[,-c(1,2,4,5)]
-  rownames(final_out) <- gsub(" ", "", substr(rownames(final_out), 1, nchar(rownames(final_out))-1), fixed=TRUE)
+  #rownames(final_out) <- gsub(" ", "", substr(rownames(final_out), 1, nchar(rownames(final_out))-1), fixed=TRUE)
   
   run = TRUE
   
-  return(list(final_out,run,length(rownames(slr_results))))
+  return(list(final_out,run,length(rownames(slr_result))))
 }
 
 ########################################## PAML results extraction function ################
@@ -524,7 +554,7 @@ length(which(results_table_test$TDG09_sites != 0))  # 939
 # overlaps with paml
 results_table_test[which(results_table_test$TDG09_PAML != 0 & results_table_test$TDG09_PAML != "No intersects"),]  # 65
 # overlaps with slr
-results_table_test[which(results_table_test$TDG09_SLR != 0 & results_table_test$TDG09_SLR != "No intersects"),]  # 25
+results_table_test[which(results_table_test$TDG09_SLR != 0 & results_table_test$TDG09_SLR != "No intersects"),]  # 8
 
 # PAML
 results_table_test[which(results_table_test$PAML_sites != 0) ,]
@@ -540,9 +570,11 @@ site_table[which(site_table$file == "/tdg09_out/17/178_5.txt"),]
 
 # SLR
 results_table_test[which(results_table_test$SLR_sites != 0) ,]
-length(which(results_table_test$SLR_sites != 0))  # 845
+length(which(results_table_test$SLR_sites != 0))  # 924
 
 # Overlap TDG and SLR
+results_table_test[which(results_table_test$TDG09_PAML != 0 & results_table_test$SLR_sites != 0),]
+
 temp_1 <- site_table[which(site_table$file == "/slr_out/Eutheria/7/7_3_matched.res"),]
 temp_2 <- site_table[which(site_table$file == "/tdg09_out/7/7_3.txt"),]
 intersect(temp_1$site, temp_2$site)

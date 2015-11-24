@@ -30,8 +30,8 @@ argparser.add_argument("--gpf", metavar="template Dir", type=str, required=True)
 
 args = argparser.parse_args()
 
-treedir = args.treefile
-outdir = args.outfile
+treedir = args.treedir
+outdir = args.outdir
 gpf = args.gpf
 
 
@@ -90,12 +90,12 @@ for species in species_numbers:
         check_dir(path.join(os.getcwd(),size))
         os.chdir(path.join(os.getcwd(),size))
         
-        tree = path.join(treedir, size, species, "tree_file")
+        tree = path.join(treedir, species, size, "tree_file")
         current_tree = pyvolve.read_tree(file = tree)        
         
         for i in range(1,n_runs+1):
             
-            check_dir(path.join(os.getcwd(),i))
+            check_dir(path.join(os.getcwd(),str(i)))
             
             my_model = pyvolve.Model("codon", {"alpha":alphas, "beta":betas, "kappa":kappa}, rate_probs=rates)
     

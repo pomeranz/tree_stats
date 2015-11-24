@@ -17,7 +17,6 @@ gpf = "/home/gideon/Documents/mphil_internship/simulations/run1.gpf"
 import pyvolve
 import os
 from os import path
-import glob
 from utils import check_dir
 import argparse
 import re
@@ -96,6 +95,7 @@ for species in species_numbers:
         for i in range(1,n_runs+1):
             
             check_dir(path.join(os.getcwd(),str(i)))
+            os.chdir(path.join(os.getcwd(),str(i)))
             
             my_model = pyvolve.Model("codon", {"alpha":alphas, "beta":betas, "kappa":kappa}, rate_probs=rates)
     

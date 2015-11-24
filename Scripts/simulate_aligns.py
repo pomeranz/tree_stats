@@ -81,22 +81,21 @@ for j in range(0,len(rates)):
 
 for species in species_numbers:
     print species
-    check_dir(path.join(os.getcwd(),species))
-    os.chdir(path.join(os.getcwd(),species))    
+    check_dir(path.join(outdir,species))
+    os.chdir(path.join(outdir,species))    
     
     for size in sizes:
         print size
-        check_dir(path.join(os.getcwd(),size))
-        os.chdir(path.join(os.getcwd(),size))
+        check_dir(path.join(outdir, species, size))
+        os.chdir(path.join(outdir, species, size))
         
         tree = path.join(treedir, species, size, "tree_file")
         current_tree = pyvolve.read_tree(file = tree)        
         
         for i in range(1,n_runs+1):
             
-            os.chdir(path.join(outdir,species,size))
-            check_dir(path.join(os.getcwd(),str(i)))
-            os.chdir(path.join(os.getcwd(),str(i)))
+            check_dir(path.join(outdir, species, size, str(i)))
+            os.chdir(path.join(outdir, species, size, str(i)))
             
             my_model = pyvolve.Model("codon", {"alpha":alphas, "beta":betas, "kappa":kappa}, rate_probs=rates)
     

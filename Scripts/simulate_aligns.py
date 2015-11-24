@@ -94,6 +94,7 @@ for species in species_numbers:
         
         for i in range(1,n_runs+1):
             
+            os.chdir(path.join(outdir,species,size))
             check_dir(path.join(os.getcwd(),str(i)))
             os.chdir(path.join(os.getcwd(),str(i)))
             

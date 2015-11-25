@@ -8,6 +8,7 @@ import shutil
 import glob
 import re
 import utils
+from utils import check_dir
 import argparse
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
@@ -35,11 +36,10 @@ ExecuteAFile ("/nfs/research2/goldman/gregs/HBL/FUBAR/FUBAR.bf", inputRedirect);
 argparser = argparse.ArgumentParser()
 argparser.add_argument('--indir', metavar='input_directory', type=str, required=True)
 argparser.add_argument('--outdir', metavar='input_directory', type=str, required=True)
-argparser.add_argument('--clade', metavar='input_directory', type=str, required=True)
 args = argparser.parse_args()
 
+
 utils.check_dir(args.outdir)
-utils.check_dir(path.join(args.outdir, args.clade))
 
 def read_slr(fh):
     stats = fh.readline()
@@ -52,7 +52,19 @@ def read_slr(fh):
         
     return seqs
 
-for f in glob.glob(path.join(args.indir, args.clade,
+sizes = "Small", "Medium", "Big"
+species_numbers = "6species", "12species", "17species", "44species"
+
+# prepare each of the 12 directories with sequences for slr
+for species in species_numbers:
+    print species
+    check_dir(path.join(args.indir, species))    
+    
+    for size in sizes:
+        print size
+        check_dir(path.join(args.indir, species, size))
+
+for f in glob.glob(path.join(args.indir, species, size,
                              '*', '*_slr.paml')):
     print f
                                  

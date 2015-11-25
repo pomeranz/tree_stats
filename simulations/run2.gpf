@@ -1,0 +1,6 @@
+n_sites=200
+n_runs=100
+alphas=1.0,1.0,1.0
+betas=0.2,1.0,1.5
+kappa=2
+rate_probs=0.85,1.0,0.05

@@ -64,47 +64,47 @@ for species in species_numbers:
         print size
         check_dir(path.join(args.indir, species, size))
 
-for f in glob.glob(path.join(args.indir, species, size,
-                             '*', '*_slr.paml')):
-    print f
-                                 
-    dirname, basename = path.split(f)
-    input_name = basename.rpartition('.')[0]
-    input_core = input_name.rpartition('_')[0]
-    seqs = read_slr(open(f))
-    
-    utils.check_dir(path.join(args.outdir, args.clade, basename[:2]))
-    out_fasta = path.abspath(path.join(args.outdir, args.clade, basename[:2], input_core+'.fa'))
-    SeqIO.write(seqs, open(out_fasta, 'w'), 'fasta')
-    
-    with open(path.join(dirname, input_name+'.nwk')) as fl:
-        _ = fl.readline()
-        tree_string = fl.readline().rstrip()
-          
-    tree = Tree.get_from_string(tree_string, 'newick')    
-    
-    #tree = Tree.get_from_path(path.join(dirname, input_name+'.nwk'), 'newick', preserve_underscores=True)
-    # rewrite the numbered tree back to a tree with ids. 
-    # easy
-    fasta_file = open(f, 'r')
-    fasta = fasta_file.readlines()
-    aln_ids = {}
-    for index,line in enumerate(fasta,start=1):
-        if index%2 == 0:
-            aln_ids[(index)/2] = line.strip("\n")
-            #print line
-            #print (index)/2
-        
-    for node in tree:
-        if node.is_leaf():
-            node.taxon.label = aln_ids[int(node.taxon.label)]
+        for f in glob.glob(path.join(args.indir, species, size,
+                                     '*', '*_slr.paml')):
+            print f
+                                         
+            dirname, basename = path.split(f)
+            input_name = basename.rpartition('.')[0]
+            input_core = input_name.rpartition('_')[0]
+            seqs = read_slr(open(f))
             
-    # write out the new tree
-    out_tree_name =path.abspath(path.join(args.outdir, args.clade, basename[:2], input_core+'.nwk'))
-    out_tree = open(out_tree_name, 'w')
-    out_tree.write(tree.as_string('newick', suppress_rooting=True))
-
-    # Write out the control file
-    control_file = open(path.join(args.outdir, args.clade, basename[:2], input_core + '_FUBAR.ctl'), 'w')
-    
-    print >>control_file, fubar_str % (out_fasta, out_tree_name)
+            utils.check_dir(path.join(args.outdir, basename[:2]))
+            out_fasta = path.abspath(path.join(args.outdir, basename[:2], input_core+'.fa'))
+            SeqIO.write(seqs, open(out_fasta, 'w'), 'fasta')
+            
+            with open(path.join(dirname, input_name+'.nwk')) as fl:
+                _ = fl.readline()
+                tree_string = fl.readline().rstrip()
+                  
+            tree = Tree.get_from_string(tree_string, 'newick')    
+            
+            #tree = Tree.get_from_path(path.join(dirname, input_name+'.nwk'), 'newick', preserve_underscores=True)
+            # rewrite the numbered tree back to a tree with ids. 
+            # easy
+            fasta_file = open(f, 'r')
+            fasta = fasta_file.readlines()
+            aln_ids = {}
+            for index,line in enumerate(fasta,start=1):
+                if index%2 == 0:
+                    aln_ids[(index)/2] = line.strip("\n")
+                    #print line
+                    #print (index)/2
+                
+            for node in tree:
+                if node.is_leaf():
+                    node.taxon.label = aln_ids[int(node.taxon.label)]
+                    
+            # write out the new tree
+            out_tree_name =path.abspath(path.join(args.outdir, basename[:2], input_core+'.nwk'))
+            out_tree = open(out_tree_name, 'w')
+            out_tree.write(tree.as_string('newick', suppress_rooting=True))
+        
+            # Write out the control file
+            control_file = open(path.join(args.outdir, basename[:2], input_core + '_FUBAR.ctl'), 'w')
+            
+            print >>control_file, fubar_str % (out_fasta, out_tree_name)

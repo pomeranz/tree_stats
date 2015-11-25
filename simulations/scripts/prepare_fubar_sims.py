@@ -73,8 +73,8 @@ for species in species_numbers:
             input_core = input_name.rpartition('_')[0]
             seqs = read_slr(open(f))
             
-            utils.check_dir(path.join(args.outdir, basename[:2]))
-            out_fasta = path.abspath(path.join(args.outdir, basename[:2], input_core+'.fa'))
+            utils.check_dir(path.join(args.outdir,species,size, basename[:2]))
+            out_fasta = path.abspath(path.join(args.outdir,species,size, basename[:2], input_core+'.fa'))
             SeqIO.write(seqs, open(out_fasta, 'w'), 'fasta')
             
             with open(path.join(dirname, input_name+'.nwk')) as fl:
@@ -100,11 +100,11 @@ for species in species_numbers:
                     node.taxon.label = aln_ids[int(node.taxon.label)]
                     
             # write out the new tree
-            out_tree_name =path.abspath(path.join(args.outdir, basename[:2], input_core+'.nwk'))
+            out_tree_name =path.abspath(path.join(args.outdir,species,size, basename[:2], input_core+'.nwk'))
             out_tree = open(out_tree_name, 'w')
             out_tree.write(tree.as_string('newick', suppress_rooting=True))
         
             # Write out the control file
-            control_file = open(path.join(args.outdir, basename[:2], input_core + '_FUBAR.ctl'), 'w')
+            control_file = open(path.join(args.outdir, species,size, basename[:2], input_core + '_FUBAR.ctl'), 'w')
             
             print >>control_file, fubar_str % (out_fasta, out_tree_name)

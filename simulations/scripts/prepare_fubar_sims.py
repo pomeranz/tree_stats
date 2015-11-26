@@ -98,11 +98,16 @@ for species in species_numbers:
             for node in tree:
                 if node.is_leaf():
                     node.taxon.label = aln_ids[int(node.taxon.label)]
+                    print node.taxon.label
                     
             # write out the new tree
             out_tree_name =path.abspath(path.join(args.outdir,species,size, prefix, input_core+'.nwk'))
             out_tree = open(out_tree_name, 'w')
-            out_tree.write(tree.as_string('newick', suppress_rooting=True))
+            temp_tree = tree.as_string('newick', suppress_rooting=True)
+            if "'" in temp_tree:
+                temp_tree = temp_tree.replace("'", "")
+                
+            out_tree.write(temp_tree)
         
             # Write out the control file
             control_file = open(path.join(args.outdir, species,size, prefix, input_core + '_FUBAR.ctl'), 'w')

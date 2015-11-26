@@ -169,7 +169,7 @@ for (species in species_numbers) {
       alpha <- fubar_res_plus[[4]]$alpha
       
       setwd(file.path(savedir_fubar, species, size))
-      png(index)
+      pdf(paste(index, ".pdf", sep=""))
       hist(alpha,breaks=100, xlab = "alpha")
       dev.off()
       
@@ -186,7 +186,7 @@ for (species in species_numbers) {
       no_sites <- nrow(slr_res_plus[[1]])
       
       setwd(file.path(savedir_slr, species, size))
-      png(index)
+      pdf(paste(index, ".pdf", sep=""))
       hist(omega,breaks=100, xlab = "omega")
       legend("topright", legend=paste("pos_sel sites:", no_sites))
       dev.off()

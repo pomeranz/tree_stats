@@ -1,0 +1,40 @@
+# SIMULATIONS WORKFLOW
+
+## PREPARATION
+## create simulated sequences
+
+# create a gpf file (just a text document) with run information
+# template (actual file without comments please):
+
+n_sites=200  # number of sites in the alignemnt
+n_runs=100  # number of replicates
+alphas=0.5,1.0 # dS
+betas=1.0,1.0  # dN
+kappa=2  
+rate_probs=0.1,0.9  # probs for the dS dN values
+
+# run simulate script
+python simulate_aligns.py --treedir [directory with trees] --outdir [output directory] --gpf [the runfile you created]
+
+# pepare data for slr and fubar
+python prepare_slr_sims.py --treeroot [directory with trees] --alnroot[output directory from simulate_aligns] --outroot [output directory]
+
+python prepare_fubar_sims.py --indir [the slr_prep_out dir] --outdir [output directory]
+
+
+## Methods
+
+# run slr and fubar
+
+python slr_bsub_sims.py --ctlroot [slr_prep_out dir] --logroot [log directory]
+
+python fubar_bsub_sims.py --inroot [fubar_prep_out dir] --logroot [log directory]
+
+
+## ANALYSIS
+
+# R script sims_analysis
+# by default will create a histogram of dS for each fubar output file
+# and for slr an omega histogram with the number of positively selected sites in the legend
+# for other things dig into the code. 
+

@@ -1,0 +1,5 @@
+n_sites=200
+n_runs=100
+alphas=0.5,1.0
+betas=1.0,1.0
+kappa=2

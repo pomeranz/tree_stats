@@ -27,11 +27,13 @@ species_numbers = "6species", "12species", "17species", "44species"
 # prepare each of the 12 directories with sequences for slr
 for species in species_numbers:
     print species
-    check_dir(path.join(inroot,species))    
+    check_dir(path.join(inroot,species)) 
+    check_dir(path.join(logroot, species))
     
     for size in sizes:
         print size
         check_dir(path.join(inroot, species, size))
+        check_dir(path.join(logroot, species, size))
 
         for infile in glob(path.join(inroot, species, size,  "*", "*_FUBAR.ctl")):
             print infile
@@ -40,7 +42,7 @@ for species in species_numbers:
             basename = basename.split("_")[0]
             prefix = basename.partition('_')[0][:2]            
             
-            logdir = path.join(logroot, basename[:2])
+            logdir = path.join(logroot, species, size, basename[:2])
         
             utils.check_dir(logdir)
         

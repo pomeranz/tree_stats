@@ -13,6 +13,7 @@ from glob import glob
 import argparse
 from subprocess import Popen
 
+import utils
 from utils import check_dir
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -46,11 +47,13 @@ species_numbers = "6species", "12species", "17species", "44species"
 # prepare each of the 12 directories with sequences for slr
 for species in species_numbers:
     print species
-    check_dir(path.join(ctlroot,species))    
+    check_dir(path.join(ctlroot,species))
+    check_dir(path.join(logroot,species))    
     
     for size in sizes:
         print size
         check_dir(path.join(ctlroot, species, size))
+        check_dir(path.join(logroot, species, size))        
         
         for infile in glob(path.join(ctlroot, species, size, "*/*_matched.ctl")):
             print infile
@@ -59,7 +62,13 @@ for species in species_numbers:
             basename = basename.split("_")[0]
             prefix = basename.partition('_')[0][:2]    
             
-            logfile = path.join(logroot, basename + '.log')   
+            logdir = path.join(logroot, species, size, basename)
+        
+            check_dir(logdir)
+        
+            logfile = path.join(logdir, basename + '.log')
+            
+              
             
             slr = slr_cmd.format(infile)
             

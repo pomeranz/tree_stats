@@ -138,6 +138,14 @@ slr_results <- function(infile) {
     return(list("No data available", run, 0))
   }
   
+  
+  slr_result <- readLines(infile)
+  slr_result <- slr_result[-1]
+  
+  single_char <- grep("Single char", slr_result)
+  all_gaps <- grep("All gaps", slr_result)
+  
+  
   cn <- c("Site", "Neutral", "Optimal", "omega", "lower", "upper", "LRT_Stat", "Pval", "Adj.Pval", "Q-value")
   
   slr_result <- read.table(infile, fill = TRUE, row.names=NULL, header = FALSE)
@@ -198,7 +206,7 @@ slr_results <- function(infile) {
   
   run = TRUE
   
-  return(list(final_out,run,length(rownames(slr_result)), slr_result))
+  return(list(final_out,run,length(rownames(slr_result)), slr_result, c(single_char,all_gaps)))
   # end of function
 }
 
@@ -237,24 +245,36 @@ plot_create <- function(name, subdir, basename, points1, points2) {
     pdf(basename)
     plot(points1,points2, xlab="PAML_omega", ylab="SLR_omega", main = paste("Correlation of omega values PAML_SLR of file", basename, sep=" "))
     abline(a=0, b=1, col="red")
-    rect(1,0,max(points1, na.rm=T), max(points2, na.rm=T), col=rgb(1,0,0,alpha=0.1), border=NA)
-    rect(0,1,max(points1, na.rm=T), max(points2, na.rm=T), col=rgb(1,0,0,alpha=0.1), border=NA)
+    if(any(points1 >= 1)) {
+      rect(1,0,max(points1, na.rm=T), max(points2, na.rm=T), col=rgb(1,0,0,alpha=0.1), border=NA)
+    }
+    if (any(points2 >= 1)) {
+      rect(0,1,max(points1, na.rm=T), max(points2, na.rm=T), col=rgb(1,0,0,alpha=0.1), border=NA)
+    }
     dev.off()
   } else if (name == "PAML_FUBAR") {
     setwd(paste("/home/gideon/Documents/mphil_internship/results_out/correlation_analysis/PAML_FUBAR/", subdir, sep = ""))
     pdf(basename)
     plot(points1,points2, xlab="PAML_omega", ylab="FUBAR_omega", main = paste("Correlation of omega values PAML_FUBAR of file", basename, sep=" "))
     abline(a=0, b=1, col="red")
-    rect(1,0,max(points1, na.rm=T), max(points2, na.rm=T), col=rgb(1,0,0,alpha=0.1), border=NA)
-    rect(0,1,max(points1, na.rm=T), max(points2, na.rm=T), col=rgb(1,0,0,alpha=0.1), border=NA)
+    if (any(points1 >= 1)) {
+      rect(1,0,max(points1, na.rm=T), max(points2, na.rm=T), col=rgb(1,0,0,alpha=0.1), border=NA)
+    }
+    if (any(points2 >= 1)) {
+      rect(0,1,max(points1, na.rm=T), max(points2, na.rm=T), col=rgb(1,0,0,alpha=0.1), border=NA)
+    }
     dev.off()
   } else {
     setwd(paste("/home/gideon/Documents/mphil_internship/results_out/correlation_analysis/SLR_FUBAR/", subdir, sep = ""))
     pdf(basename)
     plot(points1,points2, xlab="SLR_omega", ylab="FUBAR_omega", main = paste("Correlation of omega values SLR_FUBAR of file", basename, sep=" "))
     abline(a=0, b=1, col="red")
-    rect(1,0,max(points1, na.rm=T), max(points2, na.rm=T), col=rgb(1,0,0,alpha=0.1), border=NA)
-    rect(0,1,max(points1, na.rm=T), max(points2, na.rm=T), col=rgb(1,0,0,alpha=0.1), border=NA)
+    if (any(points1 >= 1)) {
+      rect(1,0,max(points1, na.rm=T), max(points2, na.rm=T), col=rgb(1,0,0,alpha=0.1), border=NA)
+    }
+    if (any(points2 >= 1)) {
+      rect(0,1,max(points1, na.rm=T), max(points2, na.rm=T), col=rgb(1,0,0,alpha=0.1), border=NA)
+    }
     dev.off()
   }
 } 
@@ -307,7 +327,7 @@ plot_save <- function(name,corr,basename, points1, points2) {
 }
 
 
-########################################## LOOOOOOOOOOOOOOOOOOOOOP ##################################################
+########################################## LOOP ##################################################
 
 # The loop extractes the site-wise values for all 3 methods and produces 3 plots at each iteration. PAML-SLR, PAML-FUBAR, SLR-FUBAR
 # based on the correlation coefficient I put them into a few categories: 
@@ -382,8 +402,18 @@ for (infile in Sys.glob(file.path(inroot, "prank_out", "*/*_prank.best.fas"))) {
     slr_points <- as.numeric(slr_res_plus[[4]]$omega)
     fubar_points <- as.numeric(fubar_res_plus[[1]]$omega)
     
+    
+    # remove the points that SLR marked as single char
+    to_remove <- slr_res_plus[[5]]
+    if (length(to_remove) != 0) {
+      slr_points <- slr_points[-to_remove]
+      paml_points <- paml_points[-to_remove]
+      fubar_points <- fubar_points[-to_remove]
+    }
+    
     # do correlations and plots and put into correct file path
     # PAML_SLR
+    
     p_s_corr <- cor.test(paml_points,slr_points)
     corr_table[index,2] <- p_s_corr$estimate
     corr_table[index,3] <- p_s_corr$p.value

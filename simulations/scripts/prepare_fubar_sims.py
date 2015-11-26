@@ -68,6 +68,7 @@ for species in species_numbers:
             print f
                                          
             dirname, basename = path.split(f)
+            basename = basename.rpartition("_")[0]
             input_name = basename.rpartition('.')[0]
             input_core = input_name.rpartition('_')[0]
             seqs = read_slr(open(f))

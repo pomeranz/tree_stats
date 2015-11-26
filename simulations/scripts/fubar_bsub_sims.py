@@ -36,7 +36,10 @@ for species in species_numbers:
         for infile in glob(path.join(inroot, species, size,  "*", "*_FUBAR.ctl")):
             print infile
             
-            basename = path.basename(infile)
+            basename = path.basename(infile).partition('.')[0]
+            basename = basename.split("_")[0]
+            prefix = basename.partition('_')[0][:2]            
+            
             logdir = path.join(logroot, basename[:2])
         
             utils.check_dir(logdir)

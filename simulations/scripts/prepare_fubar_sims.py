@@ -40,7 +40,6 @@ args = argparser.parse_args()
 
 
 utils.check_dir(args.outdir)
-
 def read_slr(fh):
     stats = fh.readline()
     seqs = []
@@ -58,11 +57,11 @@ species_numbers = "6species", "12species", "17species", "44species"
 # prepare each of the 12 directories with sequences for slr
 for species in species_numbers:
     print species
-    check_dir(path.join(args.indir, species))    
+    check_dir(path.join(args.outdir, species))    
     
     for size in sizes:
         print size
-        check_dir(path.join(args.indir, species, size))
+        check_dir(path.join(args.outdir, species, size))
 
         for f in glob.glob(path.join(args.indir, species, size,
                                      '*', '*_slr.paml')):

@@ -59,6 +59,7 @@ for infile in glob(path.join(alignroot, "*/*.phy")):
     with open(infile, 'r') as f:
         first_line = f.readline()
         if "I" not in first_line:
+	    # this adds an I to the beginning of the nexus file so that PAML can read it in
             os.system("sed '1 s/$/ I/' {0} > {0}_tmp && mv {0}_tmp {0}".format(infile))
     
     basename = path.basename(infile).partition('.')[0]

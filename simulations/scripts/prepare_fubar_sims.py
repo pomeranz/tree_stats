@@ -98,7 +98,7 @@ for species in species_numbers:
             for node in tree:
                 if node.is_leaf():
                     node.taxon.label = aln_ids[int(node.taxon.label)]
-                    print node.taxon.label
+                    # print node.taxon.label
                     
             # write out the new tree
             out_tree_name =path.abspath(path.join(args.outdir,species,size, prefix, input_core+'.nwk'))

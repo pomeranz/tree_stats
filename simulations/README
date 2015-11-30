@@ -28,7 +28,7 @@ python prepare_fubar_sims.py --indir [the slr_prep_out dir] --outdir [output dir
 
 python slr_bsub_sims.py --ctlroot [slr_prep_out dir] --logroot [log directory]
 
-python fubar_bsub_sims.py --inroot [fubar_prep_out dir] --logroot [log directory]
+python fubar_bsub_sims.py --inroot [fubar_prep_out dir] --logdir [log directory]
 
 
 ## ANALYSIS

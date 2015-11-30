@@ -6,6 +6,8 @@ Created on Thu Jul 30 13:08:06 2015
 
 Description:
 This script uses Biopythons implementation of codeml.
+It simply follows the basic example of the pdf that comes with the implemetation.
+Google buopython codeml and you will find it.
 """
 import os
 from Bio.Phylo.PAML import codeml

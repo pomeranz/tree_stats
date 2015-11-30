@@ -1,5 +1,12 @@
 # simulation results
 
+# Parameters:
+# make sure this directory already exists or create it with dir.create
+outdir <- "/home/gideon/Documents/mphil_internship/simulations/results/run3"
+fubar_indir <- "/home/gideon/Documents/mphil_internship/simulations/fubar_prep_out3"
+slr_indir <- "/home/gideon/Documents/mphil_internship/simulations/slr_prep_out3"
+
+
 # Packages 
 library(yaml)
 library(iterators)
@@ -133,9 +140,9 @@ sizes <- c("Big", "Medium", "Small")
 ### MAKE SURE TO CHECK THAT ALL DIRECTORIES ARE IN PLACE. MIGHT NEED MANUAL REFINEMENT
 
 # create the results and run directories yourself
-savedir_fubar <- "/home/gideon/Documents/mphil_internship/simulations/results/run1/fubar"
+savedir_fubar <- file.path(outdir,"fubar")
 dir.create(savedir_fubar)
-savedir_slr <- "/home/gideon/Documents/mphil_internship/simulations/results/run1/slr"
+savedir_slr <- file.path(outdir,"slr")
 dir.create(savedir_slr)
 
 savedirs <- c(savedir_fubar, savedir_slr)
@@ -162,15 +169,39 @@ for (species in species_numbers) {
     index = 1
     
     
-    for (infile in Sys.glob(file.path("/home/gideon/Documents/mphil_internship/simulations/fubar_prep_out1", species, size, "*", "*.csv"))) {
+    for (infile in Sys.glob(file.path(fubar_indir, species, size, "*", "*.csv"))) {
       
       fubar_res_plus <- fubar_results(infile)
       
       alpha <- fubar_res_plus[[4]]$alpha
+      signif_sites <- fubar_res_plus[[3]]
       
       setwd(file.path(savedir_fubar, species, size))
       pdf(paste(index, ".pdf", sep=""))
       hist(alpha,breaks=100, xlab = "alpha")
+      legend("topright", legend=paste("pos_sel sites:", signif_sites))
+      
+      dev.off()
+      
+      # make scatterplot with signif alpha vs beta show up in red
+      real <- fubar_res_plus[[4]]
+      signifs <- fubar_res_plus[[1]]
+      if (nrow(signifs) != 0) {
+        changed <- real[-c(as.numeric(rownames(signifs))),]
+      } else {
+        changed = real
+      }
+      
+      
+      
+      pdf(paste(index, "alphavbeta.pdf", sep="_"))
+      plot(changed$alpha,changed$beta)
+      if (nrow(signifs) != 0) {
+        points(signifs$alpha, signifs$beta, col="red", pch = 16)
+        legend("topright", legend=paste("pos_codons:", rownames(signifs) ))
+      }
+      
+      
       dev.off()
       
       # create basenames to acces the other files.
@@ -178,7 +209,7 @@ for (species in species_numbers) {
       prefix = basename
       
       
-      slr_file <- file.path("/home/gideon/Documents/mphil_internship/simulations/slr_prep_out1",species, size, prefix, paste(basename, "_matched.res", sep=""))
+      slr_file <- file.path(slr_indir, species, size, prefix, paste(basename, "_matched.res", sep=""))
       
       slr_res_plus <- slr_results(slr_file)
       
